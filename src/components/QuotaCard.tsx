@@ -1,16 +1,23 @@
-import { IconInfoCircle, IconRefresh } from '@tabler/icons-react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import type { QuotaLimit } from '@/data/quota'
-import { fmtCompact, fmtCountdown, fmtEpoch, fmtInt, fmtWindow } from '@/lib/format'
+import { IconInfoCircle, IconRefresh } from "@tabler/icons-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import type { QuotaLimit } from "@/data/quota";
+import {
+  fmtCompact,
+  fmtCountdown,
+  fmtEpoch,
+  fmtInt,
+  fmtWindow,
+} from "@/lib/format";
 
 function QuotaHero({ limit }: { limit: QuotaLimit }) {
-  const pct = limit.percentage || 0
-  const hasNumbers = Number.isFinite(limit.usage) && Number.isFinite(limit.currentValue)
-  const remaining = Number.isFinite(limit.remaining) ? limit.remaining : null
-  const hasReset = Number.isFinite(limit.nextResetTime)
+  const pct = limit.percentage || 0;
+  const hasNumbers =
+    Number.isFinite(limit.usage) && Number.isFinite(limit.currentValue);
+  const remaining = Number.isFinite(limit.remaining) ? limit.remaining : null;
+  const hasReset = Number.isFinite(limit.nextResetTime);
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between gap-4">
@@ -18,27 +25,29 @@ function QuotaHero({ limit }: { limit: QuotaLimit }) {
           {remaining != null ? fmtCompact(remaining) : `${pct}%`}
         </span>
         <span className="text-sm text-muted-foreground">
-          {remaining != null ? 'tokens left' : 'tokens used'}
+          {remaining != null ? "tokens left" : "tokens used"}
         </span>
       </div>
       <Progress value={pct} aria-label="Quota usage" className="h-3" />
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm text-muted-foreground">
-        <span className="tabular-nums">
-          {hasNumbers
-            ? `${fmtInt(limit.currentValue)} / ${fmtInt(limit.usage)} tokens used (${pct}%)`
-            : `${pct}% used`}
-        </span>
+        {hasNumbers && (
+          <span className="tabular-nums">
+            {fmtInt(limit.currentValue)} / {fmtInt(limit.usage)} tokens used (
+            {pct}%)
+          </span>
+        )}
         {hasReset ? (
           <span className="tabular-nums">
-            resets {fmtEpoch(limit.nextResetTime)} · in{' '}
-            {fmtCountdown(limit.nextResetTime - Date.now())} · {fmtWindow(limit)}
+            resets {fmtEpoch(limit.nextResetTime)} · in{" "}
+            {fmtCountdown(limit.nextResetTime - Date.now())} ·{" "}
+            {fmtWindow(limit)}
           </span>
         ) : (
           <span>{fmtWindow(limit)} window</span>
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export function QuotaCard({
@@ -46,8 +55,8 @@ export function QuotaCard({
   loading,
   error,
   retry,
-}: ReturnType<typeof import('@/hooks/useQuota').useQuota>) {
-  const limits = quota?.limits.filter((l) => l.type === 'TOKENS_LIMIT') ?? []
+}: ReturnType<typeof import("@/hooks/useQuota").useQuota>) {
+  const limits = quota?.limits.filter((l) => l.type === "TOKENS_LIMIT") ?? [];
 
   return (
     <Card>
@@ -78,5 +87,5 @@ export function QuotaCard({
         ))}
       </CardContent>
     </Card>
-  )
+  );
 }
