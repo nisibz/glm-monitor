@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { totalCalls, totalTokens } from '@/data/usage'
 import { useUsageData } from '@/hooks/useUsageData'
 import { ModelSummary } from '@/components/ModelSummary'
+import { QuotaCard } from '@/components/QuotaCard'
 import { SplitCharts } from '@/components/SplitCharts'
 import { SummaryCards } from '@/components/SummaryCards'
 import { UsageChart } from '@/components/UsageChart'
@@ -111,7 +112,10 @@ export default function Dashboard() {
             <div className="lg:col-span-2">
               <UsageTable rows={dataset.rows} />
             </div>
-            <ModelSummary rows={dataset.rows} />
+            <div className="flex flex-col gap-4">
+              <QuotaCard />
+              <ModelSummary rows={dataset.rows} />
+            </div>
           </div>
         </>
       ) : (
