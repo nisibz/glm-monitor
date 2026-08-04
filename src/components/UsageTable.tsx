@@ -11,10 +11,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import type { Row } from '@/data/usage'
 import { fmtInt } from '@/lib/format'
 
 const PAGE_SIZE = 15
+
+const fmtCompact2 = (n: number) =>
+  new Intl.NumberFormat('en', {
+    notation: 'compact',
+    maximumFractionDigits: 2,
+  }).format(n)
 
 type SortKey = 'time' | 'calls' | 'tokens'
 
@@ -59,7 +71,7 @@ export function UsageTable({ rows }: { rows: Row[] }) {
   )
 
   return (
-    <Card>
+    <Card className="flex h-135 flex-col">
       <CardHeader className="flex-row items-center justify-between gap-4">
         <CardTitle>Usage Details</CardTitle>
         <div className="relative w-full max-w-xs">
@@ -75,7 +87,9 @@ export function UsageTable({ rows }: { rows: Row[] }) {
           />
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex min-h-0 flex-1 flex-col">
+        <div className="scrollbar-thin min-h-0 flex-1 overflow-auto">
+        <TooltipProvider>
         <Table>
           <TableHeader>
             <TableRow>
@@ -92,7 +106,16 @@ export function UsageTable({ rows }: { rows: Row[] }) {
               <TableRow key={r.time}>
                 <TableCell className="font-mono text-xs">{r.time}</TableCell>
                 <TableCell className="text-right tabular-nums">{fmtInt(r.calls)}</TableCell>
-                <TableCell className="text-right tabular-nums">{fmtInt(r.tokens)}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="cursor-default underline decoration-dotted decoration-muted-foreground/50 underline-offset-4">
+                        {fmtCompact2(r.tokens)}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>{fmtInt(r.tokens)}</TooltipContent>
+                  </Tooltip>
+                </TableCell>
               </TableRow>
             ))}
             {pageRows.length === 0 && (
@@ -104,6 +127,8 @@ export function UsageTable({ rows }: { rows: Row[] }) {
             )}
           </TableBody>
         </Table>
+        </TooltipProvider>
+        </div>
         <div className="mt-4 flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {filtered.length} rows

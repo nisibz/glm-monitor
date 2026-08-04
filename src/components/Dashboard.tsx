@@ -91,19 +91,22 @@ export default function Dashboard() {
         <>
           <QuotaCard {...quota} />
 
-          <Tabs value={datasetId} onValueChange={setDatasetId}>
-            <TabsList>
-              {tabs.map((t) => (
-                <TabsTrigger key={t.id} value={t.id}>
-                  {t.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          <div className="flex justify-end">
+            <Tabs value={datasetId} onValueChange={setDatasetId}>
+              <TabsList>
+                {tabs.map((t) => (
+                  <TabsTrigger key={t.id} value={t.id}>
+                    {t.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </div>
 
-          <UsageChart rows={dataset.rows} />
-
-          <UsageTable rows={dataset.rows} />
+          <div className="grid gap-4 lg:grid-cols-[7fr_3fr]">
+            <UsageChart rows={dataset.rows} />
+            <UsageTable rows={dataset.rows} />
+          </div>
         </>
       ) : (
         <p className="py-10 text-center text-muted-foreground">No data available.</p>
