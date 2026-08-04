@@ -130,4 +130,7 @@
   html {
     @apply font-sans;
     }
+  html, body, #root, [data-slot="card"] {
+    transition: background-color .3s ease, border-color .3s ease, color .3s ease;
+    }
 }

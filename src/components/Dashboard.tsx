@@ -24,7 +24,12 @@ function DarkToggle() {
       onClick={() => setDark(!dark)}
       aria-label="Toggle dark mode"
     >
-      {dark ? <IconSun className="size-4" /> : <IconMoon className="size-4" />}
+      <span
+        key={dark ? 'sun' : 'moon'}
+        className="motion-safe:animate-in motion-safe:zoom-in motion-safe:duration-200"
+      >
+        {dark ? <IconSun className="size-4" /> : <IconMoon className="size-4" />}
+      </span>
     </Button>
   )
 }
@@ -54,8 +59,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="mx-auto flex min-h-svh max-w-6xl flex-col gap-4 p-4 md:p-6">
-      <header className="flex items-center justify-between gap-4">
+    <div className="mx-auto flex min-h-svh max-w-6xl flex-col gap-4 p-4 transition-colors duration-300 md:p-6">
+      <header className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-safe:duration-300 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">GLM Usage Monitor</h1>
           <p className="text-sm text-muted-foreground">Quota and usage</p>
@@ -69,7 +74,7 @@ export default function Dashboard() {
       </header>
 
       {error && (
-        <Alert>
+        <Alert className="motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in motion-safe:duration-300">
           <AlertTitle className="flex items-center justify-between">
             Failed to load data
             <Button variant="outline" size="sm" onClick={() => void retry()}>

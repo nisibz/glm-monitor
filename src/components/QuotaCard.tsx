@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useCountUp } from "@/hooks/useCountUp";
 import type { QuotaLimit } from "@/data/quota";
 import {
   fmtCompact,
@@ -18,11 +19,12 @@ function QuotaHero({ limit }: { limit: QuotaLimit }) {
     Number.isFinite(limit.usage) && Number.isFinite(limit.currentValue);
   const remaining = Number.isFinite(limit.remaining) ? limit.remaining : null;
   const hasReset = Number.isFinite(limit.nextResetTime);
+  const shown = useCountUp(remaining ?? pct);
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between gap-4">
         <span className="text-5xl font-semibold tabular-nums">
-          {remaining != null ? fmtCompact(remaining) : `${pct}%`}
+          {remaining != null ? fmtCompact(shown) : `${Math.round(shown)}%`}
         </span>
         <span className="text-sm text-muted-foreground">
           {remaining != null ? "tokens left" : "tokens used"}

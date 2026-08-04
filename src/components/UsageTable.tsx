@@ -84,7 +84,10 @@ export function UsageTable({ rows }: { rows: Row[] }) {
               {header('tokens', 'Tokens')}
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody
+            key={current}
+            className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
+          >
             {pageRows.map((r) => (
               <TableRow key={r.time}>
                 <TableCell className="font-mono text-xs">{r.time}</TableCell>

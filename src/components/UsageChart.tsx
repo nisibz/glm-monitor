@@ -66,6 +66,7 @@ export function UsageChart({ rows }: { rows: Row[] }) {
                 labelFormatter={(l) => String(l)}
               />
               <Area
+                key={m.key}
                 type="monotone"
                 dataKey={m.key}
                 name={m.label}
