@@ -37,11 +37,14 @@ function QuotaHero({ limit }: { limit: QuotaLimit }) {
           </span>
         )}
         {hasReset ? (
-          <span className="tabular-nums">
-            resets {fmtEpoch(limit.nextResetTime)} · in{" "}
-            {fmtCountdown(limit.nextResetTime - Date.now())} ·{" "}
-            {fmtWindow(limit)}
-          </span>
+          <>
+            <span className="tabular-nums">
+              resets {fmtEpoch(limit.nextResetTime)}
+            </span>
+            <span className="tabular-nums">
+              {fmtCountdown(limit.nextResetTime - Date.now())}
+            </span>
+          </>
         ) : (
           <span>{fmtWindow(limit)} window</span>
         )}
