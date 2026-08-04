@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
-import { IconChevronLeft, IconChevronRight, IconSearch } from '@tabler/icons-react'
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -31,21 +30,18 @@ const fmtCompact2 = (n: number) =>
 type SortKey = 'time' | 'calls' | 'tokens'
 
 export function UsageTable({ rows }: { rows: Row[] }) {
-  const [query, setQuery] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('time')
   const [asc, setAsc] = useState(true)
   const [page, setPage] = useState(0)
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    const list = q ? rows.filter((r) => r.time.includes(q)) : rows
     const dir = asc ? 1 : -1
-    return [...list].sort((a, b) =>
+    return [...rows].sort((a, b) =>
       typeof a[sortKey] === 'string'
         ? String(a[sortKey]).localeCompare(String(b[sortKey])) * dir
         : (Number(a[sortKey]) - Number(b[sortKey])) * dir,
     )
-  }, [rows, query, sortKey, asc])
+  }, [rows, sortKey, asc])
 
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const current = Math.min(page, pages - 1)
@@ -62,7 +58,7 @@ export function UsageTable({ rows }: { rows: Row[] }) {
 
   const header = (key: SortKey, label: string) => (
     <TableHead
-      className="cursor-pointer select-none"
+      className="sticky top-0 z-10 cursor-pointer bg-card select-none"
       onClick={() => toggleSort(key)}
     >
       {label}
@@ -72,25 +68,13 @@ export function UsageTable({ rows }: { rows: Row[] }) {
 
   return (
     <Card className="flex h-135 flex-col">
-      <CardHeader className="flex-row items-center justify-between gap-4">
+      <CardHeader>
         <CardTitle>Usage Details</CardTitle>
-        <div className="relative w-full max-w-xs">
-          <IconSearch className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search date..."
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
-              setPage(0)
-            }}
-            className="pl-8"
-          />
-        </div>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col">
         <div className="scrollbar-thin min-h-0 flex-1 overflow-auto">
         <TooltipProvider>
-        <Table>
+        <Table className="border-separate border-spacing-0">
           <TableHeader>
             <TableRow>
               {header('time', 'Date')}
