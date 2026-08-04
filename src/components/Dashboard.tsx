@@ -9,6 +9,7 @@ import { useUsageData } from '@/hooks/useUsageData'
 import { QuotaCard } from '@/components/QuotaCard'
 import { UsageChart } from '@/components/UsageChart'
 import { UsageTable } from '@/components/UsageTable'
+import { cn } from '@/lib/utils'
 
 function DarkToggle() {
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
@@ -60,8 +61,8 @@ export default function Dashboard() {
           <p className="text-sm text-muted-foreground">Quota and usage</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={refresh} aria-label="Refresh data">
-            <IconRefresh className="size-4" />
+          <Button variant="outline" size="icon" onClick={refresh} disabled={loading} aria-label="Refresh data">
+            <IconRefresh className={cn('size-4', loading && 'animate-spin')} />
           </Button>
           <DarkToggle />
         </div>
@@ -79,7 +80,7 @@ export default function Dashboard() {
         </Alert>
       )}
 
-      {loading ? (
+      {loading && datasets.length === 0 ? (
         <Loading />
       ) : dataset ? (
         <>
