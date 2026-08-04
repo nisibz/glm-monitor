@@ -21,9 +21,6 @@ interface UsageResponse {
   }
 }
 
-export const totalCalls = (rows: Row[]) => rows.reduce((s, r) => s + r.calls, 0)
-export const totalTokens = (rows: Row[]) => rows.reduce((s, r) => s + r.tokens, 0)
-
 export function getUsageRanges(now: Date = new Date()) {
   const pad = (n: number) => String(n).padStart(2, '0')
   const date = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`

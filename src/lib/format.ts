@@ -27,6 +27,7 @@ export const fmtCountdown = (ms: number) => {
 }
 
 export const fmtWindow = (limit: { unit: number; number: number }) => {
-  const unit = limit.unit === 3 ? `${limit.number}h` : limit.unit === 1 ? `${limit.number}d` : `${limit.number}m`
-  return `${unit} rolling`
+  const { unit, number } = limit
+  const suffix = unit === 6 || unit === 1 ? 'd' : unit === 3 ? 'h' : 'm'
+  return `${number}${suffix} rolling`
 }

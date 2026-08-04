@@ -4,50 +4,48 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import type { QuotaLimit } from '@/data/quota'
-import { fmtCountdown, fmtEpoch, fmtInt, fmtWindow } from '@/lib/format'
+import { fmtCompact, fmtCountdown, fmtEpoch, fmtInt, fmtWindow } from '@/lib/format'
 import { useQuota } from '@/hooks/useQuota'
 
-function LimitRow({ limit }: { limit: QuotaLimit }) {
-  const isTime = limit.type === 'TIME_LIMIT'
+function QuotaHero({ limit }: { limit: QuotaLimit }) {
+  const pct = limit.percentage || 0
+  const hasNumbers = Number.isFinite(limit.usage) && Number.isFinite(limit.currentValue)
+  const remaining = Number.isFinite(limit.remaining) ? limit.remaining : null
   const hasReset = Number.isFinite(limit.nextResetTime)
   return (
     <div>
-      <div className="mb-1.5 flex items-baseline justify-between gap-2">
-        <span className="text-sm font-medium">
-          {isTime ? `Requests / ${limit.unit} min` : 'Tokens'}
+      <div className="mb-2 flex items-baseline justify-between gap-4">
+        <span className="text-5xl font-semibold tabular-nums">
+          {remaining != null ? fmtCompact(remaining) : `${pct}%`}
         </span>
-        <span className="text-sm text-muted-foreground tabular-nums">
-          {isTime
-            ? `${fmtInt(limit.currentValue)} / ${fmtInt(limit.usage)} used · ${fmtInt(limit.remaining)} left · ${limit.percentage || 0}%`
-            : `${limit.percentage || 0}% used`}
+        <span className="text-sm text-muted-foreground">
+          {remaining != null ? 'tokens left' : 'tokens used'}
         </span>
       </div>
-      <Progress value={limit.percentage || 0} aria-label={`${limit.type} usage`} />
-      <p className="mt-1 flex items-baseline justify-between gap-2 text-xs text-muted-foreground">
+      <Progress value={pct} aria-label="Quota usage" className="h-3" />
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm text-muted-foreground">
+        <span className="tabular-nums">
+          {hasNumbers
+            ? `${fmtInt(limit.currentValue)} / ${fmtInt(limit.usage)} tokens used (${pct}%)`
+            : `${pct}% used`}
+        </span>
         {hasReset ? (
-          <>
-            <span>resets {fmtEpoch(limit.nextResetTime)}</span>
-            <span className="tabular-nums">in {fmtCountdown(limit.nextResetTime - Date.now())}</span>
-          </>
+          <span className="tabular-nums">
+            resets {fmtEpoch(limit.nextResetTime)} · in{' '}
+            {fmtCountdown(limit.nextResetTime - Date.now())} · {fmtWindow(limit)}
+          </span>
         ) : (
-          <span className="ml-auto">{fmtWindow(limit)} window</span>
+          <span>{fmtWindow(limit)} window</span>
         )}
-      </p>
-      {isTime && limit.usageDetails && (
-        <div className="mt-2 flex flex-wrap gap-2">
-          {limit.usageDetails.map((d) => (
-            <Badge key={d.modelCode} variant="secondary" className="font-mono text-xs">
-              {d.modelCode}: {fmtInt(d.usage)}
-            </Badge>
-          ))}
-        </div>
-      )}
+      </div>
     </div>
   )
 }
 
 export function QuotaCard() {
   const { quota, loading, error, retry } = useQuota()
+
+  const limits = quota?.limits.filter((l) => l.type === 'TOKENS_LIMIT') ?? []
 
   return (
     <Card>
@@ -60,7 +58,7 @@ export function QuotaCard() {
       </CardHeader>
       <CardContent className="space-y-4">
         {loading && !quota && (
-          <div className="h-24 animate-pulse rounded-lg bg-muted/50" />
+          <div className="h-32 animate-pulse rounded-lg bg-muted/50" />
         )}
         {error && (
           <div className="flex items-center justify-between gap-2">
@@ -70,7 +68,12 @@ export function QuotaCard() {
             </Button>
           </div>
         )}
-        {quota?.limits.map((limit) => <LimitRow key={limit.type} limit={limit} />)}
+        {limits.length === 0 && !loading && !error && (
+          <p className="text-sm text-muted-foreground">No quota limit found.</p>
+        )}
+        {limits.map((limit) => (
+          <QuotaHero key={limit.type} limit={limit} />
+        ))}
       </CardContent>
     </Card>
   )
