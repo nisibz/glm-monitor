@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { IconMoon, IconRefresh, IconSun } from '@tabler/icons-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -51,7 +51,12 @@ export default function Dashboard() {
   const quota = useQuota()
   const { datasets, loading, error, retry, tabs } = useUsageData()
   const [datasetId, setDatasetId] = useState('today')
+  const [hideZero, setHideZero] = useState(false)
   const dataset = datasets.find((d) => d.id === datasetId)
+  const visibleRows = useMemo(
+    () => (hideZero && dataset ? dataset.rows.filter((r) => r.calls > 0 || r.tokens > 0) : dataset?.rows ?? []),
+    [dataset, hideZero],
+  )
 
   const refresh = () => {
     void quota.retry()
@@ -91,7 +96,15 @@ export default function Dashboard() {
         <>
           <QuotaCard {...quota} />
 
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              variant={hideZero ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setHideZero(!hideZero)}
+              aria-pressed={hideZero}
+            >
+              Hide zeros
+            </Button>
             <Tabs value={datasetId} onValueChange={setDatasetId}>
               <TabsList>
                 {tabs.map((t) => (
@@ -104,8 +117,8 @@ export default function Dashboard() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[7fr_3fr]">
-            <UsageChart rows={dataset.rows} />
-            <UsageTable rows={dataset.rows} />
+            <UsageChart rows={visibleRows} />
+            <UsageTable rows={visibleRows} />
           </div>
         </>
       ) : (
