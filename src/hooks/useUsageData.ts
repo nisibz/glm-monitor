@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { fetchUsageData, getUsageRanges, type Dataset } from '@/data/usage'
+import { usePolling } from '@/hooks/usePolling'
+
+const POLL_INTERVAL = 3_600_000
 
 const TABS = [
   { id: 'today', label: 'Today' },
@@ -12,8 +15,8 @@ export function useUsageData() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true)
     setError(null)
     const { today, week, month } = getUsageRanges()
     try {
@@ -24,15 +27,17 @@ export function useUsageData() {
       ])
       setDatasets(results)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load data')
+      if (!silent) setError(e instanceof Error ? e.message : 'Failed to load data')
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [])
 
   useEffect(() => {
     void load()
   }, [load])
+
+  usePolling(() => void load(true), POLL_INTERVAL)
 
   return { datasets, loading, error, retry: load, tabs: TABS }
 }

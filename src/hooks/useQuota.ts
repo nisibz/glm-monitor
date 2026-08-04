@@ -1,26 +1,31 @@
 import { useCallback, useEffect, useState } from 'react'
 import { fetchQuota, type Quota } from '@/data/quota'
+import { usePolling } from '@/hooks/usePolling'
+
+const POLL_INTERVAL = 60_000
 
 export function useQuota() {
   const [quota, setQuota] = useState<Quota | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true)
     setError(null)
     try {
       setQuota(await fetchQuota())
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load quota')
+      if (!silent) setError(e instanceof Error ? e.message : 'Failed to load quota')
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [])
 
   useEffect(() => {
     void load()
   }, [load])
+
+  usePolling(() => void load(true), POLL_INTERVAL)
 
   return { quota, loading, error, retry: load }
 }

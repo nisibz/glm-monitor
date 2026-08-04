@@ -4,6 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useQuota } from '@/hooks/useQuota'
 import { useUsageData } from '@/hooks/useUsageData'
 import { QuotaCard } from '@/components/QuotaCard'
 import { UsageChart } from '@/components/UsageChart'
@@ -41,9 +42,15 @@ function Loading() {
 }
 
 export default function Dashboard() {
+  const quota = useQuota()
   const { datasets, loading, error, retry, tabs } = useUsageData()
   const [datasetId, setDatasetId] = useState('today')
   const dataset = datasets.find((d) => d.id === datasetId)
+
+  const refresh = () => {
+    void quota.retry()
+    void retry()
+  }
 
   return (
     <div className="mx-auto flex min-h-svh max-w-6xl flex-col gap-4 p-4 md:p-6">
@@ -52,14 +59,19 @@ export default function Dashboard() {
           <h1 className="text-2xl font-semibold tracking-tight">GLM Usage Monitor</h1>
           <p className="text-sm text-muted-foreground">Quota and usage</p>
         </div>
-        <DarkToggle />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={refresh} aria-label="Refresh data">
+            <IconRefresh className="size-4" />
+          </Button>
+          <DarkToggle />
+        </div>
       </header>
 
       {error && (
         <Alert>
           <AlertTitle className="flex items-center justify-between">
             Failed to load data
-            <Button variant="outline" size="sm" onClick={retry}>
+            <Button variant="outline" size="sm" onClick={() => void retry()}>
               <IconRefresh className="size-4" /> Retry
             </Button>
           </AlertTitle>
@@ -71,7 +83,7 @@ export default function Dashboard() {
         <Loading />
       ) : dataset ? (
         <>
-          <QuotaCard />
+          <QuotaCard {...quota} />
 
           <Tabs value={datasetId} onValueChange={setDatasetId}>
             <TabsList>
