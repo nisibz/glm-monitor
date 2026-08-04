@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useCountUp } from "@/hooks/useCountUp";
 import type { QuotaLimit } from "@/data/quota";
+import type { Row } from "@/data/usage";
 import {
   fmtCompact,
   fmtCountdown,
@@ -12,6 +13,15 @@ import {
   fmtInt,
   fmtWindow,
 } from "@/lib/format";
+
+function QuotaStat({ label, value }: { label: string; value: string }) {
+  return (
+    <span className="flex items-baseline gap-1.5 whitespace-nowrap">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="font-semibold tabular-nums">{value}</span>
+    </span>
+  );
+}
 
 function QuotaHero({ limit }: { limit: QuotaLimit }) {
   const pct = limit.percentage || 0;
@@ -60,17 +70,42 @@ export function QuotaCard({
   loading,
   error,
   retry,
-}: ReturnType<typeof import("@/hooks/useQuota").useQuota>) {
+  todayRows,
+  weekRows,
+  monthRows,
+}: ReturnType<typeof import("@/hooks/useQuota").useQuota> & {
+  todayRows?: Row[];
+  weekRows?: Row[];
+  monthRows?: Row[];
+}) {
   const limits = quota?.limits.filter((l) => l.type === "TOKENS_LIMIT") ?? [];
+  const thisHourTokens = todayRows?.at(-1)?.tokens;
+  const todayTokens = todayRows?.reduce((s, r) => s + r.tokens, 0);
+  const thisWeekTokens = weekRows?.reduce((s, r) => s + r.tokens, 0);
+  const thisMonthTokens = monthRows?.reduce((s, r) => s + r.tokens, 0);
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between gap-2">
+      <CardHeader className="items-center gap-4">
         <CardTitle className="flex items-center gap-2">
           <IconInfoCircle className="size-5 text-muted-foreground" />
           Quota
+          {quota && <Badge>{quota.level}</Badge>}
         </CardTitle>
-        {quota && <Badge>{quota.level}</Badge>}
+        <div data-slot="card-action" className="flex flex-col items-end gap-0.5">
+          {thisHourTokens != null && (
+            <QuotaStat label="This hour" value={fmtCompact(thisHourTokens)} />
+          )}
+          {todayTokens != null && (
+            <QuotaStat label="Today" value={fmtCompact(todayTokens)} />
+          )}
+          {thisWeekTokens != null && (
+            <QuotaStat label="This week" value={fmtCompact(thisWeekTokens)} />
+          )}
+          {thisMonthTokens != null && (
+            <QuotaStat label="This month" value={fmtCompact(thisMonthTokens)} />
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {loading && !quota && (

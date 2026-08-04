@@ -94,7 +94,12 @@ export default function Dashboard() {
         <Loading />
       ) : dataset ? (
         <>
-          <QuotaCard {...quota} />
+          <QuotaCard
+            {...quota}
+            todayRows={datasets.find((d) => d.id === 'today')?.rows}
+            weekRows={datasets.find((d) => d.id === 'week')?.rows}
+            monthRows={datasets.find((d) => d.id === 'month')?.rows}
+          />
 
           <div className="flex items-center justify-end gap-2">
             <Button
