@@ -30,7 +30,7 @@ function MiniChart({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[200px] w-full">
+        <div className="h-50 w-full">
           <ResponsiveContainer width="100%" height="100%">
             {type === 'line' ? (
               <LineChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>

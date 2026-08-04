@@ -1,6 +1,7 @@
 # GLM Usage Monitor
 
-Dashboard for monitoring GLM model call and token usage, with hourly (Today / 7 Days) and daily (30 Days) views.
+Dashboard for monitoring GLM model call and token usage, with hourly
+(Today / 7 Days) and daily (30 Days) views.
 
 ## Tech Stack
 
@@ -30,7 +31,8 @@ Dashboard for monitoring GLM model call and token usage, with hourly (Today / 7 
    bun run dev
    ```
 
-The dev server proxies `/api/*` requests to `https://api.z.ai/api/*` and injects the
+The dev server proxies `/api/*` requests to
+`https://api.z.ai/api/*` and injects the
 `Authorization: Bearer` header server-side, so the API key never reaches the browser.
 
 ## Deploying to Cloudflare Pages
@@ -40,7 +42,8 @@ that proxies API requests so the API key stays server-side.
 
 ### 1. Prerequisites
 
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) installed and logged in:
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/)
+  installed and logged in:
 
   ```bash
   bunx wrangler login
@@ -55,6 +58,7 @@ bun run build
 ```
 
 Outputs:
+
 - `dist/` — the static site
 - `functions/` — the proxy function (deployed alongside automatically)
 
@@ -80,7 +84,7 @@ to confirm the proxy works.
 
 ## How the API key flows
 
-```
+```text
 Browser ──GET /api/...──▶ Cloudflare Pages Function ──▶ https://api.z.ai/api/...
                           (adds Authorization: Bearer)         │
 Browser ◀─────────────── JSON ◀───────────────────────────────┘

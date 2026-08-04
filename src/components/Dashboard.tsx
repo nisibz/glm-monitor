@@ -37,17 +37,17 @@ function Loading() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[...Array(4)].map((_, i) => (
           <Card key={i}>
-            <CardContent className="h-[72px] animate-pulse rounded-lg bg-muted/50" />
+            <CardContent className="h-18 animate-pulse rounded-lg bg-muted/50" />
           </Card>
         ))}
       </div>
       <Card>
-        <CardContent className="h-[360px] animate-pulse rounded-lg bg-muted/50" />
+        <CardContent className="h-90 animate-pulse rounded-lg bg-muted/50" />
       </Card>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {[...Array(2)].map((_, i) => (
           <Card key={i}>
-            <CardContent className="h-[240px] animate-pulse rounded-lg bg-muted/50" />
+            <CardContent className="h-60 animate-pulse rounded-lg bg-muted/50" />
           </Card>
         ))}
       </div>
