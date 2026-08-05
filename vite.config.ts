@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: true,
+      port: 15173,
       proxy: {
         '/api': {
           target: 'https://api.z.ai',

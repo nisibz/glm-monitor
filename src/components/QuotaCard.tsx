@@ -98,9 +98,9 @@ function QuotaHero({
         className={cn(
           "h-3",
           warning === "destructive" &&
-            "[&>[data-slot=progress-indicator]]:bg-destructive",
+            "*:data-[slot=progress-indicator]:bg-destructive",
           warning === "amber" &&
-            "[&>[data-slot=progress-indicator]]:bg-amber-500",
+            "*:data-[slot=progress-indicator]:bg-amber-500",
         )}
       />
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm text-muted-foreground">
@@ -191,10 +191,12 @@ export function QuotaCard({
 
   return (
     <Card>
-      <CardHeader className="items-center gap-4">
-        <CardTitle className="flex items-center gap-2">
-          <IconInfoCircle className="size-5 text-muted-foreground" />
-          Quota
+      <CardHeader className="gap-4">
+        <CardTitle className="flex flex-col items-start gap-1.5">
+          <span className="flex items-center gap-2">
+            <IconInfoCircle className="size-5 text-muted-foreground" />
+            Quota
+          </span>
           {quota && <Badge>{quota.level}</Badge>}
         </CardTitle>
         <div data-slot="card-action" className="flex flex-col items-end gap-0.5">
