@@ -53,8 +53,14 @@ export default function Dashboard() {
   const quota = useQuota()
   const { datasets, loading, error, retry, tabs, lastUpdated: usageUpdated } = useUsageData()
   const now = useNow()
-  const [datasetId, setDatasetId] = useState('today')
-  const [hideZero, setHideZero] = useState(false)
+  const [datasetId, setDatasetId] = useState(
+    () => localStorage.getItem('datasetId') ?? 'today',
+  )
+  const [hideZero, setHideZero] = useState(() => localStorage.getItem('hideZero') === '1')
+  useEffect(() => {
+    localStorage.setItem('datasetId', datasetId)
+    localStorage.setItem('hideZero', hideZero ? '1' : '0')
+  }, [datasetId, hideZero])
   const dataset = datasets.find((d) => d.id === datasetId)
   const visibleRows = useMemo(
     () => (hideZero && dataset ? dataset.rows.filter((r) => r.calls > 0 || r.tokens > 0) : dataset?.rows ?? []),
