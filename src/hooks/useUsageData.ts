@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchUsageData, getUsageRanges, type Dataset } from '@/data/usage'
+import { deriveDatasets, fetchHourlyMonth, type Dataset, type Row } from '@/data/usage'
 import { usePolling } from '@/hooks/usePolling'
 
 const POLL_INTERVAL = 3_600_000
@@ -12,6 +12,7 @@ const TABS = [
 
 export function useUsageData() {
   const [datasets, setDatasets] = useState<Dataset[]>([])
+  const [hourlyMonth, setHourlyMonth] = useState<Row[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<number | null>(null)
@@ -19,14 +20,11 @@ export function useUsageData() {
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true)
     setError(null)
-    const { today, week, month } = getUsageRanges()
     try {
-      const results = await Promise.all([
-        fetchUsageData('today', TABS[0].label, today.start, today.end),
-        fetchUsageData('week', TABS[1].label, week.start, week.end),
-        fetchUsageData('month', TABS[2].label, month.start, month.end),
-      ])
-      setDatasets(results)
+      // single source: 4 chunked hourly calls cover 30 days; today/week/month are derived from it
+      const hourly = await fetchHourlyMonth()
+      setHourlyMonth(hourly)
+      setDatasets(deriveDatasets(hourly))
       setLastUpdated(Date.now())
     } catch (e) {
       if (!silent) setError(e instanceof Error ? e.message : 'Failed to load data')
@@ -41,5 +39,5 @@ export function useUsageData() {
 
   usePolling(() => void load(true), POLL_INTERVAL)
 
-  return { datasets, loading, error, retry: load, tabs: TABS, lastUpdated }
+  return { datasets, hourlyMonth, loading, error, retry: load, tabs: TABS, lastUpdated }
 }

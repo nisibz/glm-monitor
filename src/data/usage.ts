@@ -21,18 +21,15 @@ interface UsageResponse {
   }
 }
 
-export function getUsageRanges(now: Date = new Date()) {
-  const pad = (n: number) => String(n).padStart(2, '0')
-  const date = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-  const startOf = (offset: number) =>
-    `${date(new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset))} 00:00:00`
-  const endOfToday = `${date(now)} 23:59:59`
-  return {
-    today: { start: startOf(0), end: endOfToday },
-    week: { start: startOf(-6), end: endOfToday },
-    month: { start: startOf(-29), end: endOfToday },
-  }
-}
+const pad = (n: number) => String(n).padStart(2, '0')
+const dayStr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+const startOfDay = (now: Date, offset: number) =>
+  `${dayStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset))} 00:00:00`
+const endOfDay = (now: Date, offset: number) =>
+  `${dayStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset))} 23:59:59`
+
+const periodOf = (rows: Row[]) =>
+  `${rows[0]?.time.slice(0, 10) ?? ''} - ${rows.at(-1)?.time.slice(0, 10) ?? ''}`
 
 export async function fetchUsageData(
   id: string,
@@ -56,8 +53,54 @@ export async function fetchUsageData(
   return {
     id,
     label,
-    period: `${rows[0]?.time.slice(0, 10) ?? ''} - ${rows.at(-1)?.time.slice(0, 10) ?? ''}`,
+    period: periodOf(rows),
     granularity: granularity === 'daily' ? 'daily' : 'hourly',
     rows,
   }
+}
+
+// API returns hourly granularity only for ranges ≤8 days; chunk a month into ≤8-day windows.
+const HOURLY_MONTH_WINDOWS: Array<[number, number]> = [
+  [-29, -22],
+  [-21, -14],
+  [-13, -6],
+  [-5, 0],
+]
+
+export async function fetchHourlyMonth(now: Date = new Date()): Promise<Row[]> {
+  const datasets = await Promise.all(
+    HOURLY_MONTH_WINDOWS.map(([from, to]) =>
+      fetchUsageData('', '', startOfDay(now, from), endOfDay(now, to)),
+    ),
+  )
+  return datasets.flatMap((d) => d.rows)
+}
+
+const aggregateDaily = (rows: Row[]): Row[] => {
+  const map = new Map<string, Row>()
+  for (const r of rows) {
+    const day = r.time.slice(0, 10)
+    const cur = map.get(day) ?? { time: day, calls: 0, tokens: 0 }
+    cur.calls += r.calls
+    cur.tokens += r.tokens
+    map.set(day, cur)
+  }
+  return [...map.values()].sort((a, b) => a.time.localeCompare(b.time))
+}
+
+// Derive the today/week/month datasets from a single 30-day hourly source.
+export function deriveDatasets(hourly: Row[], now: Date = new Date()): Dataset[] {
+  const today = dayStr(now)
+  const weekStart = dayStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6))
+  const todayRows = hourly.filter((r) => r.time.slice(0, 10) === today)
+  const weekRows = hourly.filter((r) => {
+    const day = r.time.slice(0, 10)
+    return day >= weekStart && day <= today
+  })
+  const monthRows = aggregateDaily(hourly)
+  return [
+    { id: 'today', label: 'Today', period: periodOf(todayRows), granularity: 'hourly', rows: todayRows },
+    { id: 'week', label: '7 Days', period: periodOf(weekRows), granularity: 'hourly', rows: weekRows },
+    { id: 'month', label: '30 Days', period: periodOf(monthRows), granularity: 'daily', rows: monthRows },
+  ]
 }

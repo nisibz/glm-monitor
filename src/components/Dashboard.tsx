@@ -10,6 +10,7 @@ import { useNow } from '@/hooks/useNow'
 import { QuotaCard } from '@/components/QuotaCard'
 import { UsageChart } from '@/components/UsageChart'
 import { UsageTable } from '@/components/UsageTable'
+import { UsagePattern } from '@/components/UsagePattern'
 import { cn } from '@/lib/utils'
 import { fmtRelative } from '@/lib/format'
 
@@ -51,7 +52,7 @@ function Loading() {
 
 export default function Dashboard() {
   const quota = useQuota()
-  const { datasets, loading, error, retry, tabs, lastUpdated: usageUpdated } = useUsageData()
+  const { datasets, loading, error, retry, tabs, lastUpdated: usageUpdated, hourlyMonth } = useUsageData()
   const now = useNow()
   const [datasetId, setDatasetId] = useState(
     () => localStorage.getItem('datasetId') ?? 'today',
@@ -138,6 +139,8 @@ export default function Dashboard() {
             <UsageChart rows={visibleRows} />
             <UsageTable rows={visibleRows} />
           </div>
+
+          {hourlyMonth.length > 0 && <UsagePattern rows={hourlyMonth} />}
         </>
       ) : (
         <p className="py-10 text-center text-muted-foreground">No data available.</p>
