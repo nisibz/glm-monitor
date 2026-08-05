@@ -76,7 +76,7 @@ export async function fetchHourlyMonth(now: Date = new Date()): Promise<Row[]> {
   return datasets.flatMap((d) => d.rows)
 }
 
-const aggregateDaily = (rows: Row[]): Row[] => {
+export const aggregateDaily = (rows: Row[]): Row[] => {
   const map = new Map<string, Row>()
   for (const r of rows) {
     const day = r.time.slice(0, 10)

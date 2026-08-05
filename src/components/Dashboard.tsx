@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useQuota } from '@/hooks/useQuota'
 import { useUsageData } from '@/hooks/useUsageData'
 import { useNow } from '@/hooks/useNow'
+import { aggregateDaily } from '@/data/usage'
 import { QuotaCard } from '@/components/QuotaCard'
 import { UsageChart } from '@/components/UsageChart'
 import { UsageTable } from '@/components/UsageTable'
@@ -58,15 +59,20 @@ export default function Dashboard() {
     () => localStorage.getItem('datasetId') ?? 'today',
   )
   const [hideZero, setHideZero] = useState(() => localStorage.getItem('hideZero') === '1')
+  const [granularity, setGranularity] = useState<'hourly' | 'daily'>(
+    () => (localStorage.getItem('granularity') === 'daily' ? 'daily' : 'hourly'),
+  )
   useEffect(() => {
     localStorage.setItem('datasetId', datasetId)
     localStorage.setItem('hideZero', hideZero ? '1' : '0')
-  }, [datasetId, hideZero])
+    localStorage.setItem('granularity', granularity)
+  }, [datasetId, hideZero, granularity])
   const dataset = datasets.find((d) => d.id === datasetId)
-  const visibleRows = useMemo(
-    () => (hideZero && dataset ? dataset.rows.filter((r) => r.calls > 0 || r.tokens > 0) : dataset?.rows ?? []),
-    [dataset, hideZero],
-  )
+  const visibleRows = useMemo(() => {
+    const hourly = datasetId === 'month' ? hourlyMonth : (dataset?.rows ?? [])
+    const view = granularity === 'daily' ? aggregateDaily(hourly) : hourly
+    return hideZero ? view.filter((r) => r.calls > 0 || r.tokens > 0) : view
+  }, [datasetId, dataset, hourlyMonth, granularity, hideZero])
   const lastUpdated = Math.max(quota.lastUpdated ?? 0, usageUpdated ?? 0)
 
   const refresh = () => {
@@ -124,6 +130,12 @@ export default function Dashboard() {
             >
               Hide zeros
             </Button>
+            <Tabs value={granularity} onValueChange={(v) => setGranularity(v as 'hourly' | 'daily')}>
+              <TabsList>
+                <TabsTrigger value="hourly">Hourly</TabsTrigger>
+                <TabsTrigger value="daily">Daily</TabsTrigger>
+              </TabsList>
+            </Tabs>
             <Tabs value={datasetId} onValueChange={setDatasetId}>
               <TabsList>
                 {tabs.map((t) => (
