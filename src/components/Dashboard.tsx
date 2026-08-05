@@ -6,10 +6,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useQuota } from '@/hooks/useQuota'
 import { useUsageData } from '@/hooks/useUsageData'
+import { useNow } from '@/hooks/useNow'
 import { QuotaCard } from '@/components/QuotaCard'
 import { UsageChart } from '@/components/UsageChart'
 import { UsageTable } from '@/components/UsageTable'
 import { cn } from '@/lib/utils'
+import { fmtRelative } from '@/lib/format'
 
 function DarkToggle() {
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
@@ -49,7 +51,8 @@ function Loading() {
 
 export default function Dashboard() {
   const quota = useQuota()
-  const { datasets, loading, error, retry, tabs } = useUsageData()
+  const { datasets, loading, error, retry, tabs, lastUpdated: usageUpdated } = useUsageData()
+  const now = useNow()
   const [datasetId, setDatasetId] = useState('today')
   const [hideZero, setHideZero] = useState(false)
   const dataset = datasets.find((d) => d.id === datasetId)
@@ -57,6 +60,7 @@ export default function Dashboard() {
     () => (hideZero && dataset ? dataset.rows.filter((r) => r.calls > 0 || r.tokens > 0) : dataset?.rows ?? []),
     [dataset, hideZero],
   )
+  const lastUpdated = Math.max(quota.lastUpdated ?? 0, usageUpdated ?? 0)
 
   const refresh = () => {
     void quota.retry()
@@ -68,7 +72,10 @@ export default function Dashboard() {
       <header className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-safe:duration-300 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">GLM Usage Monitor</h1>
-          <p className="text-sm text-muted-foreground">Quota and usage</p>
+          <p className="text-sm text-muted-foreground">
+            Quota and usage
+            {lastUpdated > 0 && ` · updated ${fmtRelative(lastUpdated, now)}`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={refresh} disabled={loading} aria-label="Refresh data">

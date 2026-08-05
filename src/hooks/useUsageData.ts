@@ -14,6 +14,7 @@ export function useUsageData() {
   const [datasets, setDatasets] = useState<Dataset[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null)
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true)
@@ -26,6 +27,7 @@ export function useUsageData() {
         fetchUsageData('month', TABS[2].label, month.start, month.end),
       ])
       setDatasets(results)
+      setLastUpdated(Date.now())
     } catch (e) {
       if (!silent) setError(e instanceof Error ? e.message : 'Failed to load data')
     } finally {
@@ -39,5 +41,5 @@ export function useUsageData() {
 
   usePolling(() => void load(true), POLL_INTERVAL)
 
-  return { datasets, loading, error, retry: load, tabs: TABS }
+  return { datasets, loading, error, retry: load, tabs: TABS, lastUpdated }
 }

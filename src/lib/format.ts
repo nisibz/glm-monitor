@@ -31,3 +31,14 @@ export const fmtWindow = (limit: { unit: number; number: number }) => {
   const suffix = unit === 6 || unit === 1 ? 'd' : unit === 3 ? 'h' : 'm'
   return `${number}${suffix} rolling`
 }
+
+export const fmtRelative = (ts: number, now = Date.now()) => {
+  if (!ts) return ''
+  const s = Math.max(0, Math.floor((now - ts) / 1000))
+  if (s < 60) return 'just now'
+  const m = Math.floor(s / 60)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  return `${Math.floor(h / 24)}d ago`
+}
