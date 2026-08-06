@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card'
 
 export function Loading() {
   return (
-    <div className="flex flex-col gap-4" aria-label="Loading">
+    <div className="flex flex-col gap-4">
       <Card>
         <CardContent className="h-52 animate-pulse rounded-lg bg-muted/50" />
       </Card>

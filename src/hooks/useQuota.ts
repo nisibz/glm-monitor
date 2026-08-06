@@ -17,7 +17,8 @@ export function useQuota() {
       setQuota(await fetchQuota())
       setLastUpdated(Date.now())
     } catch (e) {
-      if (!silent) setError(e instanceof Error ? e.message : 'Failed to load quota')
+      if (!silent)
+        setError(e instanceof Error ? e.message : 'Failed to load quota')
     } finally {
       if (!silent) setLoading(false)
     }

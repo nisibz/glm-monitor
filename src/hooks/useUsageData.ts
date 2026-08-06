@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { deriveDatasets, fetchHourlyMonth, type Dataset, type Row } from '@/data/usage'
+import {
+  type Dataset,
+  deriveDatasets,
+  fetchHourlyMonth,
+  type Row,
+} from '@/data/usage'
 import { usePolling } from '@/hooks/usePolling'
 
 const POLL_INTERVAL = 3_600_000
@@ -27,7 +32,8 @@ export function useUsageData() {
       setDatasets(deriveDatasets(hourly))
       setLastUpdated(Date.now())
     } catch (e) {
-      if (!silent) setError(e instanceof Error ? e.message : 'Failed to load data')
+      if (!silent)
+        setError(e instanceof Error ? e.message : 'Failed to load data')
     } finally {
       if (!silent) setLoading(false)
     }
@@ -39,5 +45,13 @@ export function useUsageData() {
 
   usePolling(() => void load(true), POLL_INTERVAL)
 
-  return { datasets, hourlyMonth, loading, error, retry: load, tabs: TABS, lastUpdated }
+  return {
+    datasets,
+    hourlyMonth,
+    loading,
+    error,
+    retry: load,
+    tabs: TABS,
+    lastUpdated,
+  }
 }

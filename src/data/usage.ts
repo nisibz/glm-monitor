@@ -22,7 +22,8 @@ interface UsageResponse {
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
-const dayStr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+const dayStr = (d: Date) =>
+  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 const startOfDay = (now: Date, offset: number) =>
   `${dayStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset))} 00:00:00`
 const endOfDay = (now: Date, offset: number) =>
@@ -89,9 +90,14 @@ export const aggregateDaily = (rows: Row[]): Row[] => {
 }
 
 // Derive the today/week/month datasets from a single 30-day hourly source.
-export function deriveDatasets(hourly: Row[], now: Date = new Date()): Dataset[] {
+export function deriveDatasets(
+  hourly: Row[],
+  now: Date = new Date(),
+): Dataset[] {
   const today = dayStr(now)
-  const weekStart = dayStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6))
+  const weekStart = dayStr(
+    new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6),
+  )
   const todayRows = hourly.filter((r) => r.time.slice(0, 10) === today)
   const weekRows = hourly.filter((r) => {
     const day = r.time.slice(0, 10)
@@ -99,8 +105,26 @@ export function deriveDatasets(hourly: Row[], now: Date = new Date()): Dataset[]
   })
   const monthRows = aggregateDaily(hourly)
   return [
-    { id: 'today', label: 'Today', period: periodOf(todayRows), granularity: 'hourly', rows: todayRows },
-    { id: 'week', label: '7 Days', period: periodOf(weekRows), granularity: 'hourly', rows: weekRows },
-    { id: 'month', label: '30 Days', period: periodOf(monthRows), granularity: 'daily', rows: monthRows },
+    {
+      id: 'today',
+      label: 'Today',
+      period: periodOf(todayRows),
+      granularity: 'hourly',
+      rows: todayRows,
+    },
+    {
+      id: 'week',
+      label: '7 Days',
+      period: periodOf(weekRows),
+      granularity: 'hourly',
+      rows: weekRows,
+    },
+    {
+      id: 'month',
+      label: '30 Days',
+      period: periodOf(monthRows),
+      granularity: 'daily',
+      rows: monthRows,
+    },
   ]
 }

@@ -7,7 +7,8 @@ export const fmtCompact = (n: number, digits = 1) =>
 export const fmtInt = (n: number) =>
   Number.isFinite(n) ? new Intl.NumberFormat('en').format(n) : '—'
 
-export const timeLabel = (t: string) => (t.length > 10 ? t.slice(-5) : t.slice(5))
+export const timeLabel = (t: string) =>
+  t.length > 10 ? t.slice(-5) : t.slice(5)
 
 export const fmtEpoch = (ms: number) => {
   if (!Number.isFinite(ms)) return '—'

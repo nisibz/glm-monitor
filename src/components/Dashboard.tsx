@@ -1,27 +1,47 @@
 import { useMemo } from 'react'
-import { useQuota } from '@/hooks/useQuota'
-import { useUsageData } from '@/hooks/useUsageData'
-import { useNow } from '@/hooks/useNow'
-import { useViewPrefs } from '@/hooks/useViewPrefs'
-import { aggregateDaily } from '@/data/usage'
-import { QuotaCard } from '@/components/QuotaCard'
-import { UsageChart } from '@/components/UsageChart'
-import { UsageTable } from '@/components/UsageTable'
-import { UsagePattern } from '@/components/UsagePattern'
-import { DashboardHeader } from '@/components/DashboardHeader'
 import { DashboardControls } from '@/components/DashboardControls'
+import { DashboardHeader } from '@/components/DashboardHeader'
 import { LoadError } from '@/components/LoadError'
 import { Loading } from '@/components/Loading'
+import { QuotaCard } from '@/components/QuotaCard'
+import { UsageChart } from '@/components/UsageChart'
+import { UsagePattern } from '@/components/UsagePattern'
+import { UsageTable } from '@/components/UsageTable'
+import { aggregateDaily } from '@/data/usage'
+import { useNow } from '@/hooks/useNow'
+import { useQuota } from '@/hooks/useQuota'
+import { useUsageData } from '@/hooks/useUsageData'
+import { useViewPrefs } from '@/hooks/useViewPrefs'
 
 export default function Dashboard() {
   const quota = useQuota()
-  const { datasets, loading, error, retry, tabs, lastUpdated: usageUpdated, hourlyMonth } = useUsageData()
+  const {
+    datasets,
+    loading,
+    error,
+    retry,
+    tabs,
+    lastUpdated: usageUpdated,
+    hourlyMonth,
+  } = useUsageData()
   const now = useNow()
-  const { datasetId, setDatasetId, hideZero, setHideZero, granularity, setGranularity, metric, setMetric } = useViewPrefs()
+  const {
+    datasetId,
+    setDatasetId,
+    hideZero,
+    setHideZero,
+    granularity,
+    setGranularity,
+    metric,
+    setMetric,
+  } = useViewPrefs()
   const dataset = datasets.find((d) => d.id === datasetId)
   const visibleRows = useMemo(() => {
     const hourly = datasetId === 'month' ? hourlyMonth : (dataset?.rows ?? [])
-    const view = granularity === 'daily' && datasetId !== 'today' ? aggregateDaily(hourly) : hourly
+    const view =
+      granularity === 'daily' && datasetId !== 'today'
+        ? aggregateDaily(hourly)
+        : hourly
     return hideZero ? view.filter((r) => r.calls > 0 || r.tokens > 0) : view
   }, [datasetId, dataset, hourlyMonth, granularity, hideZero])
   const lastUpdated = Math.max(quota.lastUpdated ?? 0, usageUpdated ?? 0)
@@ -33,7 +53,12 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto flex min-h-svh max-w-6xl flex-col gap-4 p-4 transition-colors duration-300 md:p-6">
-      <DashboardHeader lastUpdated={lastUpdated} now={now} loading={loading} onRefresh={refresh} />
+      <DashboardHeader
+        lastUpdated={lastUpdated}
+        now={now}
+        loading={loading}
+        onRefresh={refresh}
+      />
 
       {error && <LoadError error={error} onRetry={() => void retry()} />}
 
@@ -65,10 +90,14 @@ export default function Dashboard() {
             <UsageTable rows={visibleRows} />
           </div>
 
-          {hourlyMonth.length > 0 && <UsagePattern rows={hourlyMonth} metric={metric} />}
+          {hourlyMonth.length > 0 && (
+            <UsagePattern rows={hourlyMonth} metric={metric} />
+          )}
         </>
       ) : (
-        <p className="py-10 text-center text-muted-foreground">No data available.</p>
+        <p className="py-10 text-center text-muted-foreground">
+          No data available.
+        </p>
       )}
     </div>
   )

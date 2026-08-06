@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo } from 'react'
 import {
   Bar,
   BarChart,
@@ -7,32 +7,39 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Row } from "@/data/usage";
-import { fmtCompact, fmtInt } from "@/lib/format";
-import { METRICS, type Metric } from "@/lib/metrics";
-import { Leaderboard } from "@/components/Leaderboard";
+} from 'recharts'
+import { Leaderboard } from '@/components/Leaderboard'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Row } from '@/data/usage'
+import { fmtCompact, fmtInt } from '@/lib/format'
+import { METRICS, type Metric } from '@/lib/metrics'
 
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 // ponytail: timestamp treated as local-naive; weekday via local parse so it matches the user's locale.
 const weekdayIndex = (time: string) => {
-  const day = new Date(`${time.slice(0, 10)}T00:00:00`).getDay(); // 0=Sun..6=Sat
-  return (day + 6) % 7; // -> 0=Mon..6=Sun
-};
-
-interface ChartCardProps {
-  title: string;
-  data: { label: string; value: number }[];
-  color: string;
-  dimension: "hour" | "weekday";
-  rows: Row[];
-  metric: Metric;
+  const day = new Date(`${time.slice(0, 10)}T00:00:00`).getDay() // 0=Sun..6=Sat
+  return (day + 6) % 7 // -> 0=Mon..6=Sun
 }
 
-function ChartCard({ title, data, color, dimension, rows, metric }: ChartCardProps) {
-  const m = METRICS[metric];
+interface ChartCardProps {
+  title: string
+  data: { label: string; value: number }[]
+  color: string
+  dimension: 'hour' | 'weekday'
+  rows: Row[]
+  metric: Metric
+}
+
+function ChartCard({
+  title,
+  data,
+  color,
+  dimension,
+  rows,
+  metric,
+}: ChartCardProps) {
+  const m = METRICS[metric]
   return (
     <Card className="flex h-112 flex-col">
       <CardHeader>
@@ -66,7 +73,7 @@ function ChartCard({ title, data, color, dimension, rows, metric }: ChartCardPro
               />
               <Tooltip
                 formatter={(v) => [fmtInt(Number(v)), m.label]}
-                cursor={{ fill: "var(--muted)" }}
+                cursor={{ fill: 'var(--muted)' }}
               />
               <Bar dataKey="value" fill={color} radius={[3, 3, 0, 0]} />
             </BarChart>
@@ -77,35 +84,35 @@ function ChartCard({ title, data, color, dimension, rows, metric }: ChartCardPro
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 export function UsagePattern({
   rows,
   metric,
 }: {
-  rows: Row[];
-  metric: Metric;
+  rows: Row[]
+  metric: Metric
 }) {
   const byHour = useMemo(() => {
     const buckets = Array.from({ length: 24 }, (_, h) => ({
-      label: String(h).padStart(2, "0"),
+      label: String(h).padStart(2, '0'),
       value: 0,
-    }));
+    }))
     for (const r of rows) {
-      const h = Number(r.time.slice(11, 13));
-      if (h >= 0 && h < 24) buckets[h].value += r[metric];
+      const h = Number(r.time.slice(11, 13))
+      if (h >= 0 && h < 24) buckets[h].value += r[metric]
     }
-    return buckets;
-  }, [rows, metric]);
+    return buckets
+  }, [rows, metric])
 
   const byWeekday = useMemo(() => {
-    const buckets = WEEKDAYS.map((label) => ({ label, value: 0 }));
+    const buckets = WEEKDAYS.map((label) => ({ label, value: 0 }))
     for (const r of rows) {
-      buckets[weekdayIndex(r.time)].value += r[metric];
+      buckets[weekdayIndex(r.time)].value += r[metric]
     }
-    return buckets;
-  }, [rows, metric]);
+    return buckets
+  }, [rows, metric])
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
@@ -126,5 +133,5 @@ export function UsagePattern({
         metric={metric}
       />
     </div>
-  );
+  )
 }

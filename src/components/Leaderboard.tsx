@@ -36,7 +36,10 @@ export function Leaderboard({
           }))
         : WEEKDAYS.map((label) => ({ label, value: 0 }))
     for (const r of rows) {
-      const i = dimension === 'hour' ? Number(r.time.slice(11, 13)) : weekdayIndex(r.time)
+      const i =
+        dimension === 'hour'
+          ? Number(r.time.slice(11, 13))
+          : weekdayIndex(r.time)
       if (i >= 0 && i < buckets.length) buckets[i].value += r[metric]
     }
     return buckets
@@ -54,10 +57,12 @@ export function Leaderboard({
               i < 3 ? 'font-semibold text-foreground' : 'text-muted-foreground'
             }`}
           >
-            <span className="w-5 text-right text-xs text-muted-foreground">{i + 1}</span>
+            <span className="w-5 text-right text-muted-foreground text-xs">
+              {i + 1}
+            </span>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-default font-mono underline decoration-dotted decoration-muted-foreground/50 underline-offset-4">
+                <span className="cursor-default font-mono underline decoration-muted-foreground/50 decoration-dotted underline-offset-4">
                   {b.label}
                 </span>
               </TooltipTrigger>

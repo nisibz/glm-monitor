@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
-import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
+import { useMemo, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -9,65 +9,65 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import type { Row } from "@/data/usage";
-import { fmtCompact, fmtInt } from "@/lib/format";
+} from '@/components/ui/tooltip'
+import type { Row } from '@/data/usage'
+import { fmtCompact, fmtInt } from '@/lib/format'
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 10
 
-type SortKey = "time" | "calls" | "tokens";
+type SortKey = 'time' | 'calls' | 'tokens'
 
 export function UsageTable({ rows }: { rows: Row[] }) {
-  const [sortKey, setSortKey] = useState<SortKey>("time");
-  const [asc, setAsc] = useState(true);
-  const [page, setPage] = useState(0);
+  const [sortKey, setSortKey] = useState<SortKey>('time')
+  const [asc, setAsc] = useState(true)
+  const [page, setPage] = useState(0)
 
   const filtered = useMemo(() => {
-    const dir = asc ? 1 : -1;
+    const dir = asc ? 1 : -1
     return [...rows].sort((a, b) =>
-      typeof a[sortKey] === "string"
+      typeof a[sortKey] === 'string'
         ? String(a[sortKey]).localeCompare(String(b[sortKey])) * dir
         : (Number(a[sortKey]) - Number(b[sortKey])) * dir,
-    );
-  }, [rows, sortKey, asc]);
+    )
+  }, [rows, sortKey, asc])
 
-  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const current = Math.min(page, pages - 1);
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const current = Math.min(page, pages - 1)
   const pageRows = filtered.slice(
     current * PAGE_SIZE,
     (current + 1) * PAGE_SIZE,
-  );
+  )
 
   const toggleSort = (key: SortKey) => {
-    if (key === sortKey) setAsc(!asc);
+    if (key === sortKey) setAsc(!asc)
     else {
-      setSortKey(key);
-      setAsc(true);
+      setSortKey(key)
+      setAsc(true)
     }
-    setPage(0);
-  };
+    setPage(0)
+  }
 
   const header = (
     key: SortKey,
     label: string,
-    align: "left" | "right" = "right",
+    align: 'left' | 'right' = 'right',
   ) => (
     <TableHead
-      className={`sticky top-0 z-10 cursor-pointer bg-card select-none ${align === "right" ? "text-right" : ""}`}
+      className={`sticky top-0 z-10 cursor-pointer select-none bg-card ${align === 'right' ? 'text-right' : ''}`}
       onClick={() => toggleSort(key)}
     >
       {label}
       {sortKey === key && (
-        <span className="ml-1 text-muted-foreground">{asc ? "↑" : "↓"}</span>
+        <span className="ml-1 text-muted-foreground">{asc ? '↑' : '↓'}</span>
       )}
     </TableHead>
-  );
+  )
 
   return (
     <Card className="flex h-135 flex-col">
@@ -80,14 +80,14 @@ export function UsageTable({ rows }: { rows: Row[] }) {
             <Table className="border-separate border-spacing-0">
               <TableHeader>
                 <TableRow>
-                  {header("time", "Date", "left")}
-                  {header("calls", "Calls")}
-                  {header("tokens", "Tokens")}
+                  {header('time', 'Date', 'left')}
+                  {header('calls', 'Calls')}
+                  {header('tokens', 'Tokens')}
                 </TableRow>
               </TableHeader>
               <TableBody
                 key={current}
-                className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
+                className="motion-safe:fade-in motion-safe:animate-in motion-safe:duration-300"
               >
                 {pageRows.map((r) => (
                   <TableRow key={r.time}>
@@ -100,7 +100,7 @@ export function UsageTable({ rows }: { rows: Row[] }) {
                     <TableCell className="text-right tabular-nums">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="cursor-default underline decoration-dotted decoration-muted-foreground/50 underline-offset-4">
+                          <span className="cursor-default underline decoration-muted-foreground/50 decoration-dotted underline-offset-4">
                             {fmtCompact(r.tokens, 2)}
                           </span>
                         </TooltipTrigger>
@@ -124,7 +124,7 @@ export function UsageTable({ rows }: { rows: Row[] }) {
           </TooltipProvider>
         </div>
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {filtered.length} rows
           </p>
           <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export function UsageTable({ rows }: { rows: Row[] }) {
             >
               <IconChevronLeft className="size-4" />
             </Button>
-            <span className="text-sm text-muted-foreground tabular-nums">
+            <span className="text-muted-foreground text-sm tabular-nums">
               {current + 1} / {pages}
             </span>
             <Button
@@ -153,5 +153,5 @@ export function UsageTable({ rows }: { rows: Row[] }) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

@@ -17,11 +17,20 @@ const GRAN_LABEL = { hourly: 'Hourly', daily: 'Daily' } as const
 
 // ponytail: stack both labels in one grid cell so the button keeps the widest
 // label's width instead of resizing when the flipped value changes.
-function StableText({ activeIndex, options }: { activeIndex: number; options: readonly string[] }) {
+function StableText({
+  activeIndex,
+  options,
+}: {
+  activeIndex: number
+  options: readonly string[]
+}) {
   return (
     <span className="inline-grid">
       {options.map((o, i) => (
-        <span key={o} className={`col-start-1 row-start-1 ${i === activeIndex ? '' : 'invisible'}`}>
+        <span
+          key={o}
+          className={`col-start-1 row-start-1 ${i === activeIndex ? '' : 'invisible'}`}
+        >
           {o}
         </span>
       ))}
@@ -62,7 +71,11 @@ export function DashboardControls({
         aria-pressed={hideZero}
         aria-label={hideZero ? 'Show zero rows' : 'Hide zero rows'}
       >
-        {hideZero ? <IconEyeOff className="size-4" /> : <IconEye className="size-4" />}
+        {hideZero ? (
+          <IconEyeOff className="size-4" />
+        ) : (
+          <IconEye className="size-4" />
+        )}
       </Button>
       <Button
         variant="outline"
@@ -70,16 +83,24 @@ export function DashboardControls({
         aria-label={`Metric: ${METRICS[metric].label}. Click to switch`}
       >
         <MetricIcon className="size-4" />
-        <StableText activeIndex={metric === 'tokens' ? 1 : 0} options={[METRICS.calls.label, METRICS.tokens.label]} />
+        <StableText
+          activeIndex={metric === 'tokens' ? 1 : 0}
+          options={[METRICS.calls.label, METRICS.tokens.label]}
+        />
         <IconArrowsExchange className="size-3 text-muted-foreground" />
       </Button>
       <Button
         variant="outline"
-        onClick={() => onGranularityChange(granularity === 'hourly' ? 'daily' : 'hourly')}
+        onClick={() =>
+          onGranularityChange(granularity === 'hourly' ? 'daily' : 'hourly')
+        }
         aria-label={`Granularity: ${GRAN_LABEL[granularity]}. Click to switch`}
       >
         <GranIcon className="size-4" />
-        <StableText activeIndex={granularity === 'daily' ? 1 : 0} options={[GRAN_LABEL.hourly, GRAN_LABEL.daily]} />
+        <StableText
+          activeIndex={granularity === 'daily' ? 1 : 0}
+          options={[GRAN_LABEL.hourly, GRAN_LABEL.daily]}
+        />
         <IconArrowsExchange className="size-3 text-muted-foreground" />
       </Button>
       <Tabs value={datasetId} onValueChange={onDatasetChange}>

@@ -100,4 +100,6 @@ Browser ◀─────────────── JSON ◀─────
 | `bun run dev`        | Start dev server with proxy          |
 | `bun run build`      | Type-check + build to `dist/`        |
 | `bun run preview`    | Preview the production build locally |
-| `bun run lint`       | Run oxlint                           |
+| `bun run lint`       | Run Biome (format + lint + imports)  |
+| `bun run lint:fix`   | Biome check with auto-fixes (write)  |
+| `bun run format`     | Format all files with Biome (write)  |

@@ -5,12 +5,14 @@ export function useViewPrefs() {
   const [datasetId, setDatasetId] = useState(
     () => localStorage.getItem('datasetId') ?? 'today',
   )
-  const [hideZero, setHideZero] = useState(() => localStorage.getItem('hideZero') === '1')
-  const [granularity, setGranularity] = useState<'hourly' | 'daily'>(
-    () => (localStorage.getItem('granularity') === 'daily' ? 'daily' : 'hourly'),
+  const [hideZero, setHideZero] = useState(
+    () => localStorage.getItem('hideZero') === '1',
   )
-  const [metric, setMetric] = useState<Metric>(
-    () => (localStorage.getItem('metric') === 'calls' ? 'calls' : 'tokens'),
+  const [granularity, setGranularity] = useState<'hourly' | 'daily'>(() =>
+    localStorage.getItem('granularity') === 'daily' ? 'daily' : 'hourly',
+  )
+  const [metric, setMetric] = useState<Metric>(() =>
+    localStorage.getItem('metric') === 'calls' ? 'calls' : 'tokens',
   )
   useEffect(() => {
     localStorage.setItem('datasetId', datasetId)
