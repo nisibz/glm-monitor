@@ -1,6 +1,33 @@
+import {
+  IconApi,
+  IconArrowsExchange,
+  IconCalendar,
+  IconClock,
+  IconCoin,
+  IconEye,
+  IconEyeOff,
+} from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import type { Metric } from '@/lib/metrics'
+import { METRICS, type Metric } from '@/lib/metrics'
+
+const METRIC_ICON = { calls: IconApi, tokens: IconCoin } as const
+const GRAN_ICON = { hourly: IconClock, daily: IconCalendar } as const
+const GRAN_LABEL = { hourly: 'Hourly', daily: 'Daily' } as const
+
+// ponytail: stack both labels in one grid cell so the button keeps the widest
+// label's width instead of resizing when the flipped value changes.
+function StableText({ activeIndex, options }: { activeIndex: number; options: readonly string[] }) {
+  return (
+    <span className="inline-grid">
+      {options.map((o, i) => (
+        <span key={o} className={`col-start-1 row-start-1 ${i === activeIndex ? '' : 'invisible'}`}>
+          {o}
+        </span>
+      ))}
+    </span>
+  )
+}
 
 export function DashboardControls({
   hideZero,
@@ -23,28 +50,38 @@ export function DashboardControls({
   onDatasetChange: (v: string) => void
   tabs: { id: string; label: string }[]
 }) {
+  const MetricIcon = METRIC_ICON[metric]
+  const GranIcon = GRAN_ICON[granularity]
+
   return (
-    <div className="flex items-center justify-end gap-2">
+    <div className="flex flex-wrap items-center justify-end gap-2">
       <Button
-        variant={hideZero ? 'default' : 'outline'}
-        size="sm"
+        variant="outline"
+        size="icon"
         onClick={onToggleHideZero}
         aria-pressed={hideZero}
+        aria-label={hideZero ? 'Show zero rows' : 'Hide zero rows'}
       >
-        Hide zeros
+        {hideZero ? <IconEyeOff className="size-4" /> : <IconEye className="size-4" />}
       </Button>
-      <Tabs value={metric} onValueChange={(v) => onMetricChange(v as Metric)}>
-        <TabsList>
-          <TabsTrigger value="calls">Calls</TabsTrigger>
-          <TabsTrigger value="tokens">Tokens</TabsTrigger>
-        </TabsList>
-      </Tabs>
-      <Tabs value={granularity} onValueChange={(v) => onGranularityChange(v as 'hourly' | 'daily')}>
-        <TabsList>
-          <TabsTrigger value="hourly">Hourly</TabsTrigger>
-          <TabsTrigger value="daily">Daily</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <Button
+        variant="outline"
+        onClick={() => onMetricChange(metric === 'calls' ? 'tokens' : 'calls')}
+        aria-label={`Metric: ${METRICS[metric].label}. Click to switch`}
+      >
+        <MetricIcon className="size-4" />
+        <StableText activeIndex={metric === 'tokens' ? 1 : 0} options={[METRICS.calls.label, METRICS.tokens.label]} />
+        <IconArrowsExchange className="size-3 text-muted-foreground" />
+      </Button>
+      <Button
+        variant="outline"
+        onClick={() => onGranularityChange(granularity === 'hourly' ? 'daily' : 'hourly')}
+        aria-label={`Granularity: ${GRAN_LABEL[granularity]}. Click to switch`}
+      >
+        <GranIcon className="size-4" />
+        <StableText activeIndex={granularity === 'daily' ? 1 : 0} options={[GRAN_LABEL.hourly, GRAN_LABEL.daily]} />
+        <IconArrowsExchange className="size-3 text-muted-foreground" />
+      </Button>
       <Tabs value={datasetId} onValueChange={onDatasetChange}>
         <TabsList>
           {tabs.map((t) => (
