@@ -68,9 +68,13 @@ const HOURLY_MONTH_WINDOWS: Array<[number, number]> = [
   [-5, 0],
 ]
 
-export async function fetchHourlyMonth(now: Date = new Date()): Promise<Row[]> {
+export async function fetchHourlyMonth(
+  now: Date = new Date(),
+  includeOld = true,
+): Promise<Row[]> {
+  const windows = includeOld ? HOURLY_MONTH_WINDOWS : [[-5, 0]]
   const datasets = await Promise.all(
-    HOURLY_MONTH_WINDOWS.map(([from, to]) =>
+    windows.map(([from, to]) =>
       fetchUsageData('', '', startOfDay(now, from), endOfDay(now, to)),
     ),
   )

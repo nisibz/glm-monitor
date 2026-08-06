@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { fetchQuota, type Quota } from '@/data/quota'
 import { usePolling } from '@/hooks/usePolling'
 
-const POLL_INTERVAL = 60_000
+const POLL_INTERVAL = 30_000
 
 export function useQuota() {
   const [quota, setQuota] = useState<Quota | null>(null)

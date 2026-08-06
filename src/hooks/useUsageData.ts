@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   type Dataset,
   deriveDatasets,
@@ -21,13 +21,21 @@ export function useUsageData() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<number | null>(null)
+  // Past-day rows never change; fetch them once, then only the moving window.
+  const rowsRef = useRef(new Map<string, Row>())
+  const hasOldRef = useRef(false)
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true)
     setError(null)
     try {
-      // single source: 4 chunked hourly calls cover 30 days; today/week/month are derived from it
-      const hourly = await fetchHourlyMonth()
+      const rows = await fetchHourlyMonth(new Date(), !hasOldRef.current)
+      const map = rowsRef.current
+      for (const r of rows) map.set(r.time, r)
+      if (rows.length > 0) hasOldRef.current = true
+      const hourly = [...map.values()].sort((a, b) =>
+        a.time.localeCompare(b.time),
+      )
       setHourlyMonth(hourly)
       setDatasets(deriveDatasets(hourly))
       setLastUpdated(Date.now())
