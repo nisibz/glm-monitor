@@ -17,15 +17,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { Row } from "@/data/usage";
-import { fmtInt } from "@/lib/format";
+import { fmtCompact, fmtInt } from "@/lib/format";
 
 const PAGE_SIZE = 10;
-
-const fmtCompact2 = (n: number) =>
-  new Intl.NumberFormat("en", {
-    notation: "compact",
-    maximumFractionDigits: 2,
-  }).format(n);
 
 type SortKey = "time" | "calls" | "tokens";
 
@@ -107,7 +101,7 @@ export function UsageTable({ rows }: { rows: Row[] }) {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span className="cursor-default underline decoration-dotted decoration-muted-foreground/50 underline-offset-4">
-                            {fmtCompact2(r.tokens)}
+                            {fmtCompact(r.tokens, 2)}
                           </span>
                         </TooltipTrigger>
                         <TooltipContent>{fmtInt(r.tokens)}</TooltipContent>

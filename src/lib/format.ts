@@ -1,7 +1,7 @@
-export const fmtCompact = (n: number) =>
+export const fmtCompact = (n: number, digits = 1) =>
   new Intl.NumberFormat('en', {
     notation: 'compact',
-    maximumFractionDigits: 1,
+    maximumFractionDigits: digits,
   }).format(n)
 
 export const fmtInt = (n: number) =>
