@@ -11,6 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Row } from "@/data/usage";
 import { fmtCompact, fmtInt } from "@/lib/format";
+import { METRICS, type Metric } from "@/lib/metrics";
 import { Leaderboard } from "@/components/Leaderboard";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -23,13 +24,15 @@ const weekdayIndex = (time: string) => {
 
 interface ChartCardProps {
   title: string;
-  data: { label: string; tokens: number }[];
+  data: { label: string; value: number }[];
   color: string;
   dimension: "hour" | "weekday";
   rows: Row[];
+  metric: Metric;
 }
 
-function ChartCard({ title, data, color, dimension, rows }: ChartCardProps) {
+function ChartCard({ title, data, color, dimension, rows, metric }: ChartCardProps) {
+  const m = METRICS[metric];
   return (
     <Card className="flex h-112 flex-col">
       <CardHeader>
@@ -62,41 +65,47 @@ function ChartCard({ title, data, color, dimension, rows }: ChartCardProps) {
                 className="text-xs"
               />
               <Tooltip
-                formatter={(v) => [fmtInt(Number(v)), "Tokens"]}
+                formatter={(v) => [fmtInt(Number(v)), m.label]}
                 cursor={{ fill: "var(--muted)" }}
               />
-              <Bar dataKey="tokens" fill={color} radius={[3, 3, 0, 0]} />
+              <Bar dataKey="value" fill={color} radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
         <div className="flex w-18 shrink-0 flex-col">
-          <Leaderboard rows={rows} dimension={dimension} />
+          <Leaderboard rows={rows} dimension={dimension} metric={metric} />
         </div>
       </CardContent>
     </Card>
   );
 }
 
-export function UsagePattern({ rows }: { rows: Row[] }) {
+export function UsagePattern({
+  rows,
+  metric,
+}: {
+  rows: Row[];
+  metric: Metric;
+}) {
   const byHour = useMemo(() => {
     const buckets = Array.from({ length: 24 }, (_, h) => ({
       label: String(h).padStart(2, "0"),
-      tokens: 0,
+      value: 0,
     }));
     for (const r of rows) {
       const h = Number(r.time.slice(11, 13));
-      if (h >= 0 && h < 24) buckets[h].tokens += r.tokens;
+      if (h >= 0 && h < 24) buckets[h].value += r[metric];
     }
     return buckets;
-  }, [rows]);
+  }, [rows, metric]);
 
   const byWeekday = useMemo(() => {
-    const buckets = WEEKDAYS.map((label) => ({ label, tokens: 0 }));
+    const buckets = WEEKDAYS.map((label) => ({ label, value: 0 }));
     for (const r of rows) {
-      buckets[weekdayIndex(r.time)].tokens += r.tokens;
+      buckets[weekdayIndex(r.time)].value += r[metric];
     }
     return buckets;
-  }, [rows]);
+  }, [rows, metric]);
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
@@ -106,6 +115,7 @@ export function UsagePattern({ rows }: { rows: Row[] }) {
         color="var(--chart-1)"
         dimension="hour"
         rows={rows}
+        metric={metric}
       />
       <ChartCard
         title="Usage by weekday"
@@ -113,6 +123,7 @@ export function UsagePattern({ rows }: { rows: Row[] }) {
         color="var(--chart-2)"
         dimension="weekday"
         rows={rows}
+        metric={metric}
       />
     </div>
   );

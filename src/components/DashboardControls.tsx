@@ -1,11 +1,14 @@
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import type { Metric } from '@/lib/metrics'
 
 export function DashboardControls({
   hideZero,
   onToggleHideZero,
   granularity,
   onGranularityChange,
+  metric,
+  onMetricChange,
   datasetId,
   onDatasetChange,
   tabs,
@@ -14,6 +17,8 @@ export function DashboardControls({
   onToggleHideZero: () => void
   granularity: 'hourly' | 'daily'
   onGranularityChange: (v: 'hourly' | 'daily') => void
+  metric: Metric
+  onMetricChange: (v: Metric) => void
   datasetId: string
   onDatasetChange: (v: string) => void
   tabs: { id: string; label: string }[]
@@ -28,6 +33,12 @@ export function DashboardControls({
       >
         Hide zeros
       </Button>
+      <Tabs value={metric} onValueChange={(v) => onMetricChange(v as Metric)}>
+        <TabsList>
+          <TabsTrigger value="calls">Calls</TabsTrigger>
+          <TabsTrigger value="tokens">Tokens</TabsTrigger>
+        </TabsList>
+      </Tabs>
       <Tabs value={granularity} onValueChange={(v) => onGranularityChange(v as 'hourly' | 'daily')}>
         <TabsList>
           <TabsTrigger value="hourly">Hourly</TabsTrigger>

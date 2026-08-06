@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/tooltip'
 import type { Row } from '@/data/usage'
 import { fmtCompact, fmtInt } from '@/lib/format'
+import { METRICS, type Metric } from '@/lib/metrics'
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
@@ -19,26 +20,29 @@ const weekdayIndex = (time: string) => {
 export function Leaderboard({
   rows,
   dimension,
+  metric,
 }: {
   rows: Row[]
   dimension: 'hour' | 'weekday'
+  metric: Metric
 }) {
+  const label = METRICS[metric].label
   const ranked = useMemo(() => {
     const buckets =
       dimension === 'hour'
         ? Array.from({ length: 24 }, (_, h) => ({
             label: String(h).padStart(2, '0'),
-            tokens: 0,
+            value: 0,
           }))
-        : WEEKDAYS.map((label) => ({ label, tokens: 0 }))
+        : WEEKDAYS.map((label) => ({ label, value: 0 }))
     for (const r of rows) {
       const i = dimension === 'hour' ? Number(r.time.slice(11, 13)) : weekdayIndex(r.time)
-      if (i >= 0 && i < buckets.length) buckets[i].tokens += r.tokens
+      if (i >= 0 && i < buckets.length) buckets[i].value += r[metric]
     }
     return buckets
       .map((b, i) => ({ ...b, idx: i }))
-      .sort((a, b) => b.tokens - a.tokens || a.idx - b.idx)
-  }, [rows, dimension])
+      .sort((a, b) => b.value - a.value || a.idx - b.idx)
+  }, [rows, dimension, metric])
 
   return (
     <TooltipProvider>
@@ -58,7 +62,7 @@ export function Leaderboard({
                 </span>
               </TooltipTrigger>
               <TooltipContent>
-                {fmtCompact(b.tokens)} ({fmtInt(b.tokens)})
+                {fmtCompact(b.value)} ({fmtInt(b.value)}) {label}
               </TooltipContent>
             </Tooltip>
           </li>

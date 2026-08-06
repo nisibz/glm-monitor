@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { Metric } from '@/lib/metrics'
 
 export function useViewPrefs() {
   const [datasetId, setDatasetId] = useState(
@@ -8,10 +9,23 @@ export function useViewPrefs() {
   const [granularity, setGranularity] = useState<'hourly' | 'daily'>(
     () => (localStorage.getItem('granularity') === 'daily' ? 'daily' : 'hourly'),
   )
+  const [metric, setMetric] = useState<Metric>(
+    () => (localStorage.getItem('metric') === 'calls' ? 'calls' : 'tokens'),
+  )
   useEffect(() => {
     localStorage.setItem('datasetId', datasetId)
     localStorage.setItem('hideZero', hideZero ? '1' : '0')
     localStorage.setItem('granularity', granularity)
-  }, [datasetId, hideZero, granularity])
-  return { datasetId, setDatasetId, hideZero, setHideZero, granularity, setGranularity }
+    localStorage.setItem('metric', metric)
+  }, [datasetId, hideZero, granularity, metric])
+  return {
+    datasetId,
+    setDatasetId,
+    hideZero,
+    setHideZero,
+    granularity,
+    setGranularity,
+    metric,
+    setMetric,
+  }
 }

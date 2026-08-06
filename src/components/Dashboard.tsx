@@ -17,7 +17,7 @@ export default function Dashboard() {
   const quota = useQuota()
   const { datasets, loading, error, retry, tabs, lastUpdated: usageUpdated, hourlyMonth } = useUsageData()
   const now = useNow()
-  const { datasetId, setDatasetId, hideZero, setHideZero, granularity, setGranularity } = useViewPrefs()
+  const { datasetId, setDatasetId, hideZero, setHideZero, granularity, setGranularity, metric, setMetric } = useViewPrefs()
   const dataset = datasets.find((d) => d.id === datasetId)
   const visibleRows = useMemo(() => {
     const hourly = datasetId === 'month' ? hourlyMonth : (dataset?.rows ?? [])
@@ -53,17 +53,19 @@ export default function Dashboard() {
             onToggleHideZero={() => setHideZero(!hideZero)}
             granularity={granularity}
             onGranularityChange={setGranularity}
+            metric={metric}
+            onMetricChange={setMetric}
             datasetId={datasetId}
             onDatasetChange={setDatasetId}
             tabs={tabs}
           />
 
           <div className="grid gap-4 lg:grid-cols-[7fr_3fr]">
-            <UsageChart rows={visibleRows} />
+            <UsageChart rows={visibleRows} metric={metric} />
             <UsageTable rows={visibleRows} />
           </div>
 
-          {hourlyMonth.length > 0 && <UsagePattern rows={hourlyMonth} />}
+          {hourlyMonth.length > 0 && <UsagePattern rows={hourlyMonth} metric={metric} />}
         </>
       ) : (
         <p className="py-10 text-center text-muted-foreground">No data available.</p>

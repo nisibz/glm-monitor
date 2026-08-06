@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   Area,
   AreaChart,
@@ -9,31 +8,17 @@ import {
   YAxis,
 } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Row } from '@/data/usage'
 import { fmtCompact, fmtInt, timeLabel } from '@/lib/format'
+import { METRICS, type Metric } from '@/lib/metrics'
 
-const METRICS = {
-  calls: { key: 'calls', label: 'Calls', color: 'var(--chart-2)' },
-  tokens: { key: 'tokens', label: 'Tokens', color: 'var(--chart-1)' },
-} as const
-
-type Metric = keyof typeof METRICS
-
-export function UsageChart({ rows }: { rows: Row[] }) {
-  const [metric, setMetric] = useState<Metric>('tokens')
+export function UsageChart({ rows, metric }: { rows: Row[]; metric: Metric }) {
   const m = METRICS[metric]
 
   return (
     <Card className="flex h-135 flex-col">
-      <CardHeader className="flex-row items-center justify-between gap-4">
+      <CardHeader>
         <CardTitle>Usage Overview</CardTitle>
-        <Tabs value={metric} onValueChange={(v) => setMetric(v as Metric)}>
-          <TabsList>
-            <TabsTrigger value="calls">Calls</TabsTrigger>
-            <TabsTrigger value="tokens">Tokens</TabsTrigger>
-          </TabsList>
-        </Tabs>
       </CardHeader>
       <CardContent className="min-h-0 flex-1">
         <div className="h-full w-full">
