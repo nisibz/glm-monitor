@@ -142,7 +142,7 @@
   html {
     @apply font-sans;
     }
-  html, body, #root, [data-slot="card"] {
+  html.themed, html.themed body, html.themed #root, html.themed [data-slot="card"] {
     transition: background-color .3s ease, border-color .3s ease, color .3s ease;
     }
 }

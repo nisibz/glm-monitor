@@ -5,6 +5,10 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GLM Usage Monitor</title>
+    <style>
+      html { background: oklch(0.9383 0.0042 236.4993); color: oklch(0.3211 0 0); color-scheme: light; }
+      html.dark { background: oklch(0.2925 0.0157 264.3); color: oklch(0.7621 0.0202 263.0); color-scheme: dark; }
+    </style>
     <script>
       if (
         localStorage.theme === 'dark' ||
@@ -12,6 +16,7 @@
       ) {
         document.documentElement.classList.add('dark')
       }
+      requestAnimationFrame(() => document.documentElement.classList.add('themed'))
     </script>
   </head>
   <body>
