@@ -21,7 +21,7 @@ export default function Dashboard() {
   const dataset = datasets.find((d) => d.id === datasetId)
   const visibleRows = useMemo(() => {
     const hourly = datasetId === 'month' ? hourlyMonth : (dataset?.rows ?? [])
-    const view = granularity === 'daily' ? aggregateDaily(hourly) : hourly
+    const view = granularity === 'daily' && datasetId !== 'today' ? aggregateDaily(hourly) : hourly
     return hideZero ? view.filter((r) => r.calls > 0 || r.tokens > 0) : view
   }, [datasetId, dataset, hourlyMonth, granularity, hideZero])
   const lastUpdated = Math.max(quota.lastUpdated ?? 0, usageUpdated ?? 0)
