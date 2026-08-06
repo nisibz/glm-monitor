@@ -1,72 +1,23 @@
-import { useEffect, useMemo, useState } from 'react'
-import { IconMoon, IconRefresh, IconSun } from '@tabler/icons-react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useMemo } from 'react'
 import { useQuota } from '@/hooks/useQuota'
 import { useUsageData } from '@/hooks/useUsageData'
 import { useNow } from '@/hooks/useNow'
+import { useViewPrefs } from '@/hooks/useViewPrefs'
 import { aggregateDaily } from '@/data/usage'
 import { QuotaCard } from '@/components/QuotaCard'
 import { UsageChart } from '@/components/UsageChart'
 import { UsageTable } from '@/components/UsageTable'
 import { UsagePattern } from '@/components/UsagePattern'
-import { cn } from '@/lib/utils'
-import { fmtRelative } from '@/lib/format'
-
-function DarkToggle() {
-  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark)
-    localStorage.setItem('theme', dark ? 'dark' : 'light')
-  }, [dark])
-  return (
-    <Button
-      variant="outline"
-      size="icon"
-      onClick={() => setDark(!dark)}
-      aria-label="Toggle dark mode"
-    >
-      <span
-        key={dark ? 'sun' : 'moon'}
-        className="motion-safe:animate-in motion-safe:zoom-in motion-safe:duration-200"
-      >
-        {dark ? <IconSun className="size-4" /> : <IconMoon className="size-4" />}
-      </span>
-    </Button>
-  )
-}
-
-function Loading() {
-  return (
-    <div className="flex flex-col gap-4" aria-label="Loading">
-      <Card>
-        <CardContent className="h-36 animate-pulse rounded-lg bg-muted/50" />
-      </Card>
-      <Card>
-        <CardContent className="h-90 animate-pulse rounded-lg bg-muted/50" />
-      </Card>
-    </div>
-  )
-}
+import { DashboardHeader } from '@/components/DashboardHeader'
+import { DashboardControls } from '@/components/DashboardControls'
+import { LoadError } from '@/components/LoadError'
+import { Loading } from '@/components/Loading'
 
 export default function Dashboard() {
   const quota = useQuota()
   const { datasets, loading, error, retry, tabs, lastUpdated: usageUpdated, hourlyMonth } = useUsageData()
   const now = useNow()
-  const [datasetId, setDatasetId] = useState(
-    () => localStorage.getItem('datasetId') ?? 'today',
-  )
-  const [hideZero, setHideZero] = useState(() => localStorage.getItem('hideZero') === '1')
-  const [granularity, setGranularity] = useState<'hourly' | 'daily'>(
-    () => (localStorage.getItem('granularity') === 'daily' ? 'daily' : 'hourly'),
-  )
-  useEffect(() => {
-    localStorage.setItem('datasetId', datasetId)
-    localStorage.setItem('hideZero', hideZero ? '1' : '0')
-    localStorage.setItem('granularity', granularity)
-  }, [datasetId, hideZero, granularity])
+  const { datasetId, setDatasetId, hideZero, setHideZero, granularity, setGranularity } = useViewPrefs()
   const dataset = datasets.find((d) => d.id === datasetId)
   const visibleRows = useMemo(() => {
     const hourly = datasetId === 'month' ? hourlyMonth : (dataset?.rows ?? [])
@@ -82,33 +33,9 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto flex min-h-svh max-w-6xl flex-col gap-4 p-4 transition-colors duration-300 md:p-6">
-      <header className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-safe:duration-300 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">GLM Usage Monitor</h1>
-          <p className="text-sm text-muted-foreground">
-            Quota and usage
-            {lastUpdated > 0 && ` · updated ${fmtRelative(lastUpdated, now)}`}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={refresh} disabled={loading} aria-label="Refresh data">
-            <IconRefresh className={cn('size-4', loading && 'animate-spin')} />
-          </Button>
-          <DarkToggle />
-        </div>
-      </header>
+      <DashboardHeader lastUpdated={lastUpdated} now={now} loading={loading} onRefresh={refresh} />
 
-      {error && (
-        <Alert className="motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in motion-safe:duration-300">
-          <AlertTitle className="flex items-center justify-between">
-            Failed to load data
-            <Button variant="outline" size="sm" onClick={() => void retry()}>
-              <IconRefresh className="size-4" /> Retry
-            </Button>
-          </AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      {error && <LoadError error={error} onRetry={() => void retry()} />}
 
       {loading && datasets.length === 0 ? (
         <Loading />
@@ -121,31 +48,15 @@ export default function Dashboard() {
             monthRows={datasets.find((d) => d.id === 'month')?.rows}
           />
 
-          <div className="flex items-center justify-end gap-2">
-            <Button
-              variant={hideZero ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setHideZero(!hideZero)}
-              aria-pressed={hideZero}
-            >
-              Hide zeros
-            </Button>
-            <Tabs value={granularity} onValueChange={(v) => setGranularity(v as 'hourly' | 'daily')}>
-              <TabsList>
-                <TabsTrigger value="hourly">Hourly</TabsTrigger>
-                <TabsTrigger value="daily">Daily</TabsTrigger>
-              </TabsList>
-            </Tabs>
-            <Tabs value={datasetId} onValueChange={setDatasetId}>
-              <TabsList>
-                {tabs.map((t) => (
-                  <TabsTrigger key={t.id} value={t.id}>
-                    {t.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </div>
+          <DashboardControls
+            hideZero={hideZero}
+            onToggleHideZero={() => setHideZero(!hideZero)}
+            granularity={granularity}
+            onGranularityChange={setGranularity}
+            datasetId={datasetId}
+            onDatasetChange={setDatasetId}
+            tabs={tabs}
+          />
 
           <div className="grid gap-4 lg:grid-cols-[7fr_3fr]">
             <UsageChart rows={visibleRows} />
