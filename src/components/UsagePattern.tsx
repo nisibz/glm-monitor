@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo } from "react";
 import {
   Bar,
   BarChart,
@@ -7,103 +7,113 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Row } from '@/data/usage'
-import { fmtCompact, fmtInt } from '@/lib/format'
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Row } from "@/data/usage";
+import { fmtCompact, fmtInt } from "@/lib/format";
+import { Leaderboard } from "@/components/Leaderboard";
 
-const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // ponytail: timestamp treated as local-naive; weekday via local parse so it matches the user's locale.
 const weekdayIndex = (time: string) => {
-  const day = new Date(`${time.slice(0, 10)}T00:00:00`).getDay() // 0=Sun..6=Sat
-  return (day + 6) % 7 // -> 0=Mon..6=Sun
+  const day = new Date(`${time.slice(0, 10)}T00:00:00`).getDay(); // 0=Sun..6=Sat
+  return (day + 6) % 7; // -> 0=Mon..6=Sun
+};
+
+interface ChartCardProps {
+  title: string;
+  data: { label: string; tokens: number }[];
+  color: string;
+  dimension: "hour" | "weekday";
+  rows: Row[];
+}
+
+function ChartCard({ title, data, color, dimension, rows }: ChartCardProps) {
+  return (
+    <Card className="flex h-112 flex-col">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex min-h-0 flex-1 gap-3">
+        <div className="min-w-0 flex-1">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data}
+              margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                className="stroke-border"
+              />
+              <XAxis
+                dataKey="label"
+                tickLine={false}
+                axisLine={false}
+                minTickGap={12}
+                className="text-xs"
+              />
+              <YAxis
+                tickFormatter={fmtCompact}
+                tickLine={false}
+                axisLine={false}
+                width={48}
+                className="text-xs"
+              />
+              <Tooltip
+                formatter={(v) => [fmtInt(Number(v)), "Tokens"]}
+                cursor={{ fill: "var(--muted)" }}
+              />
+              <Bar dataKey="tokens" fill={color} radius={[3, 3, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="flex w-18 shrink-0 flex-col">
+          <Leaderboard rows={rows} dimension={dimension} />
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export function UsagePattern({ rows }: { rows: Row[] }) {
   const byHour = useMemo(() => {
     const buckets = Array.from({ length: 24 }, (_, h) => ({
-      label: String(h).padStart(2, '0'),
+      label: String(h).padStart(2, "0"),
       tokens: 0,
-    }))
+    }));
     for (const r of rows) {
-      const h = Number(r.time.slice(11, 13))
-      if (h >= 0 && h < 24) buckets[h].tokens += r.tokens
+      const h = Number(r.time.slice(11, 13));
+      if (h >= 0 && h < 24) buckets[h].tokens += r.tokens;
     }
-    return buckets
-  }, [rows])
+    return buckets;
+  }, [rows]);
 
   const byWeekday = useMemo(() => {
-    const buckets = WEEKDAYS.map((label) => ({ label, tokens: 0 }))
+    const buckets = WEEKDAYS.map((label) => ({ label, tokens: 0 }));
     for (const r of rows) {
-      buckets[weekdayIndex(r.time)].tokens += r.tokens
+      buckets[weekdayIndex(r.time)].tokens += r.tokens;
     }
-    return buckets
-  }, [rows])
+    return buckets;
+  }, [rows]);
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <Card className="flex h-80 flex-col">
-        <CardHeader>
-          <CardTitle>Usage by hour of day</CardTitle>
-        </CardHeader>
-        <CardContent className="min-h-0 flex-1">
-          <div className="h-full w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={byHour} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-border" />
-                <XAxis
-                  dataKey="label"
-                  tickLine={false}
-                  axisLine={false}
-                  minTickGap={12}
-                  className="text-xs"
-                />
-                <YAxis
-                  tickFormatter={fmtCompact}
-                  tickLine={false}
-                  axisLine={false}
-                  width={48}
-                  className="text-xs"
-                />
-                <Tooltip
-                  formatter={(v) => [fmtInt(Number(v)), 'Tokens']}
-                  cursor={{ fill: 'var(--muted)' }}
-                />
-                <Bar dataKey="tokens" fill="var(--chart-1)" radius={[3, 3, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="flex h-80 flex-col">
-        <CardHeader>
-          <CardTitle>Usage by weekday</CardTitle>
-        </CardHeader>
-        <CardContent className="min-h-0 flex-1">
-          <div className="h-full w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={byWeekday} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-border" />
-                <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-xs" />
-                <YAxis
-                  tickFormatter={fmtCompact}
-                  tickLine={false}
-                  axisLine={false}
-                  width={48}
-                  className="text-xs"
-                />
-                <Tooltip
-                  formatter={(v) => [fmtInt(Number(v)), 'Tokens']}
-                  cursor={{ fill: 'var(--muted)' }}
-                />
-                <Bar dataKey="tokens" fill="var(--chart-2)" radius={[3, 3, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      <ChartCard
+        title="Usage by hour of day"
+        data={byHour}
+        color="var(--chart-1)"
+        dimension="hour"
+        rows={rows}
+      />
+      <ChartCard
+        title="Usage by weekday"
+        data={byWeekday}
+        color="var(--chart-2)"
+        dimension="weekday"
+        rows={rows}
+      />
     </div>
-  )
+  );
 }
