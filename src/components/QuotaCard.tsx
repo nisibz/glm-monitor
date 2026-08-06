@@ -33,9 +33,9 @@ function QuotaStat({
           className={cn(
             "text-xs tabular-nums",
             delta > 0
-              ? "text-amber-500"
+              ? "text-warning"
               : delta < 0
-                ? "text-emerald-500"
+                ? "text-success"
                 : "text-muted-foreground",
           )}
         >
@@ -100,7 +100,7 @@ function QuotaHero({
           warning === "destructive" &&
             "*:data-[slot=progress-indicator]:bg-destructive",
           warning === "amber" &&
-            "*:data-[slot=progress-indicator]:bg-amber-500",
+            "*:data-[slot=progress-indicator]:bg-warning",
         )}
       />
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm text-muted-foreground">
