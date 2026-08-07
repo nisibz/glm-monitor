@@ -26,19 +26,10 @@ interface ChartCardProps {
   title: string
   data: { label: string; value: number }[]
   color: string
-  dimension: 'hour' | 'weekday'
-  rows: Row[]
   metric: Metric
 }
 
-function ChartCard({
-  title,
-  data,
-  color,
-  dimension,
-  rows,
-  metric,
-}: ChartCardProps) {
+function ChartCard({ title, data, color, metric }: ChartCardProps) {
   const m = METRICS[metric]
   return (
     <Card className="flex h-112 flex-col">
@@ -80,7 +71,7 @@ function ChartCard({
           </ResponsiveContainer>
         </div>
         <div className="flex w-18 shrink-0 flex-col">
-          <Leaderboard rows={rows} dimension={dimension} metric={metric} />
+          <Leaderboard data={data} metric={metric} />
         </div>
       </CardContent>
     </Card>
@@ -120,16 +111,12 @@ export function UsagePattern({
         title="Usage by hour of day"
         data={byHour}
         color="var(--chart-1)"
-        dimension="hour"
-        rows={rows}
         metric={metric}
       />
       <ChartCard
         title="Usage by weekday"
         data={byWeekday}
         color="var(--chart-2)"
-        dimension="weekday"
-        rows={rows}
         metric={metric}
       />
     </div>

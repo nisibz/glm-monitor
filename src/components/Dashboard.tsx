@@ -8,7 +8,6 @@ import { UsageChart } from '@/components/UsageChart'
 import { UsagePattern } from '@/components/UsagePattern'
 import { UsageTable } from '@/components/UsageTable'
 import { aggregateDaily } from '@/data/usage'
-import { useNow } from '@/hooks/useNow'
 import { useQuota } from '@/hooks/useQuota'
 import { useUsageData } from '@/hooks/useUsageData'
 import { useViewPrefs } from '@/hooks/useViewPrefs'
@@ -20,11 +19,9 @@ export default function Dashboard() {
     loading,
     error,
     retry,
-    tabs,
     lastUpdated: usageUpdated,
     hourlyMonth,
   } = useUsageData()
-  const now = useNow()
   const {
     datasetId,
     setDatasetId,
@@ -55,7 +52,6 @@ export default function Dashboard() {
     <div className="mx-auto flex min-h-svh max-w-6xl flex-col gap-4 p-4 transition-colors duration-300 md:p-6">
       <DashboardHeader
         lastUpdated={lastUpdated}
-        now={now}
         loading={loading}
         onRefresh={refresh}
       />
@@ -82,7 +78,7 @@ export default function Dashboard() {
             onMetricChange={setMetric}
             datasetId={datasetId}
             onDatasetChange={setDatasetId}
-            tabs={tabs}
+            tabs={datasets.map((d) => ({ id: d.id, label: d.label }))}
           />
 
           <div className="grid gap-4 lg:grid-cols-[7fr_3fr]">

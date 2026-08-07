@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import type { QuotaLimit } from '@/data/quota'
 import type { Row } from '@/data/usage'
-import { useCountUp } from '@/hooks/useCountUp'
 import {
+  dayStr,
   fmtCompact,
   fmtCountdown,
   fmtEpoch,
@@ -59,7 +59,7 @@ function QuotaHero({
     Number.isFinite(limit.usage) && Number.isFinite(limit.currentValue)
   const remaining = Number.isFinite(limit.remaining) ? limit.remaining : null
   const hasReset = Number.isFinite(limit.nextResetTime)
-  const shown = useCountUp(remaining ?? pct)
+  const shown = remaining ?? pct
 
   const hoursUntilReset = hasReset
     ? (limit.nextResetTime - Date.now()) / 3_600_000
@@ -143,11 +143,8 @@ const sumByDateRange = (
   now = new Date(),
 ) => {
   if (!rows?.length) return undefined
-  const pad = (n: number) => String(n).padStart(2, '0')
-  const d = (off: number) => {
-    const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + off)
-    return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`
-  }
+  const d = (off: number) =>
+    dayStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() + off))
   const from = d(fromOffset)
   const to = d(toOffset)
   return rows

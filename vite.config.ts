@@ -19,7 +19,6 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: 'https://api.z.ai',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '/api'),
           configure: (proxy) => {
             proxy.on('proxyReq', (proxyReq) => {
               if (env.ZAI_API_KEY) {

@@ -10,11 +10,12 @@ export const fmtInt = (n: number) =>
 export const timeLabel = (t: string) =>
   t.length > 10 ? t.slice(-5) : t.slice(5)
 
+export const dayStr = (d: Date) => d.toLocaleDateString('en-CA')
+
 export const fmtEpoch = (ms: number) => {
   if (!Number.isFinite(ms)) return '—'
   const d = new Date(ms)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+  return `${dayStr(d)} ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
 }
 
 export const fmtCountdown = (ms: number) => {

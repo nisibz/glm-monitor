@@ -9,12 +9,6 @@ import { usePolling } from '@/hooks/usePolling'
 
 const POLL_INTERVAL = 3_600_000
 
-const TABS = [
-  { id: 'today', label: 'Today' },
-  { id: 'week', label: '7 Days' },
-  { id: 'month', label: '30 Days' },
-]
-
 export function useUsageData() {
   const [datasets, setDatasets] = useState<Dataset[]>([])
   const [hourlyMonth, setHourlyMonth] = useState<Row[]>([])
@@ -59,7 +53,6 @@ export function useUsageData() {
     loading,
     error,
     retry: load,
-    tabs: TABS,
     lastUpdated,
   }
 }
