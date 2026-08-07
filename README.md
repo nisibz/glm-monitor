@@ -3,6 +3,17 @@
 Dashboard for monitoring GLM model call and token usage, with hourly
 (Today / 7 Days) and daily (30 Days) views.
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+## Features
+
+- Quota dashboard: remaining tokens, usage %, burn-rate, and estimated
+  run-out countdown before reset
+- Usage views: **Today** (hourly), **7 Days** (hourly), **30 Days** (daily)
+- Usage pattern analysis: tokens/calls by hour-of-day and weekday
+- Metric flip (calls ⇄ tokens), daily ⇄ hourly granularity, hide-zero-row toggle
+- Auto-refresh with edge-cached proxy; dark/light mode
+
 ## Tech Stack
 
 - Vite + React + TypeScript
@@ -19,11 +30,13 @@ Dashboard for monitoring GLM model call and token usage, with hourly
    bun install
    ```
 
-2. Create `.env` in the project root (gitignored):
+2. Create `.env` from the template (`.env` is gitignored):
 
-   ```env
-   ZAI_API_KEY=<your Z.AI API key>
+   ```bash
+   cp .env.example .env
    ```
+
+   Then set `ZAI_API_KEY` to your Z.AI API key.
 
 3. Start the dev server:
 
