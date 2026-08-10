@@ -56,49 +56,53 @@ bunx dotenvx set NEW_KEY "some-value"
 ## Deploying to Cloudflare Pages
 
 The dashboard is a static SPA plus one Pages Function (`functions/api/[...path].ts`)
-that proxies API requests so the API key stays server-side.
+that proxies API requests so the API key stays server-side. Deploy via native
+Git integration — every push to `main` rebuilds and deploys automatically.
 
-### 1. Prerequisites
+### 1. Connect the repo
 
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/)
-  installed and logged in:
+1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** →
+   **Connect to Git**
+2. Authorize the Cloudflare GitHub app and select this repo
+3. Project name: `glm-monitor` (becomes the `*.pages.dev` subdomain);
+   production branch: `main`
 
-  ```bash
-  bunx wrangler login
-  ```
+### 2. Build settings
 
-- A Cloudflare account.
+| Field | Value |
+| --- | --- |
+| Framework preset | None |
+| Build command | `bun run build` |
+| Build output directory | `dist` |
+| Root directory | (leave empty) |
 
-### 2. Build
+Cloudflare detects Bun from `bun.lock`. To gate deploys on lint, set the
+build command to `bun run lint && bun run build` instead.
 
-```bash
-bun run build
-```
+### 3. Set the API key
 
-Outputs:
+The API key is **not** in the bundle — the Pages Function reads it from a
+runtime environment variable. Under **Environment variables**, add:
 
-- `dist/` — the static site
-- `functions/` — the proxy function (deployed alongside automatically)
+- `ZAI_API_KEY` — your Z.AI API key (Production environment)
 
-### 3. Deploy
+Get the value locally with `bunx dotenvx get ZAI_API_KEY`.
 
-```bash
-bunx wrangler pages deploy dist --project-name glm-monitor
-```
+### 4. Save and Deploy
 
-### 4. Set the API key
+Cloudflare builds and deploys. Subsequent pushes to `main` redeploy
+automatically — no CLI or workflow file required.
 
-The API key is **not** in the bundle — it must be set on the Pages project:
-
-1. Cloudflare dashboard → your Pages project → **Settings** → **Environment variables**
-2. Add `ZAI_API_KEY` with your Z.AI API key (Production environment)
-3. The change takes effect on the next deployment (re-run step 3 to apply)
+> The build log prints a `could not decrypt .env` warning — this is expected
+> and harmless. `.env.keys` (the decryption key) is gitignored, so it isn't
+> in the build environment; the key isn't needed at build time anyway.
 
 ### 5. Verify
 
-Open your deployed URL — the dashboard should load with live data. Check the
-network tab (or `curl https://<project>.pages.dev/api/monitor/usage/model-usage?startTime=...`)
-to confirm the proxy works.
+Open the deployed URL — the dashboard should load with live data. Check the
+network tab (or
+`curl https://glm-monitor.pages.dev/api/monitor/usage/model-usage?startTime=...`)
+to confirm the proxy works. A `401` means `ZAI_API_KEY` is missing or wrong.
 
 ## How the API key flows
 
