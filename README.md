@@ -30,13 +30,10 @@ Dashboard for monitoring GLM model call and token usage, with hourly
    bun install
    ```
 
-2. Create `.env` from the template (`.env` is gitignored):
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Then set `ZAI_API_KEY` to your Z.AI API key.
+2. Get the `.env.keys` file from the repo owner and place it at the project
+   root. `.env` is committed **encrypted** (via
+   [dotenvx](https://dotenvx.com)); `.env.keys` holds the private key needed
+   to decrypt it and is **gitignored** — never commit it.
 
 3. Start the dev server:
 
@@ -44,9 +41,17 @@ Dashboard for monitoring GLM model call and token usage, with hourly
    bun run dev
    ```
 
-The dev server proxies `/api/*` requests to
-`https://api.z.ai/api/*` and injects the
-`Authorization: Bearer` header server-side, so the API key never reaches the browser.
+   `vite.config.ts` imports `@dotenvx/dotenvx/config`, which decrypts `.env`
+   into `process.env` automatically, so the dev proxy can inject the
+   `Authorization: Bearer` header server-side. The API key never reaches the
+   browser.
+
+To add or change a value, use dotenvx (it re-encrypts automatically), then
+commit the updated `.env`:
+
+```bash
+bunx dotenvx set NEW_KEY "some-value"
+```
 
 ## Deploying to Cloudflare Pages
 

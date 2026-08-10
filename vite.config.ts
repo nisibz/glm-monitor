@@ -1,10 +1,10 @@
+import '@dotenvx/dotenvx/config'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, import.meta.dirname, '')
+export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
     resolve: {
@@ -21,8 +21,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           configure: (proxy) => {
             proxy.on('proxyReq', (proxyReq) => {
-              if (env.ZAI_API_KEY) {
-                proxyReq.setHeader('Authorization', `Bearer ${env.ZAI_API_KEY}`)
+              if (process.env.ZAI_API_KEY) {
+                proxyReq.setHeader(
+                  'Authorization',
+                  `Bearer ${process.env.ZAI_API_KEY}`,
+                )
               }
             })
           },

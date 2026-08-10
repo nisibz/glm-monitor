@@ -11,7 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
+
+# dotenvx: .env is encrypted and committed; .env.keys holds the private key
+.env.keys
 
 # Editor directories and files
 .vscode/*
