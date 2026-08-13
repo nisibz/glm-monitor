@@ -55,7 +55,7 @@ bunx dotenvx set NEW_KEY "some-value"
 
 ## Deploying to Cloudflare Pages
 
-The dashboard is a static SPA plus one Pages Function (`functions/api/[...path].ts`)
+The dashboard is a static SPA plus one Pages Function (`functions/api/[[path]].ts`)
 that proxies API requests so the API key stays server-side. Deploy via native
 Git integration — every push to `main` rebuilds and deploys automatically.
 
@@ -113,7 +113,7 @@ Browser ◀─────────────── JSON ◀─────
 ```
 
 - **Dev:** Vite proxy in `vite.config.ts` (reads `.env`)
-- **Prod:** Pages Function `functions/api/[...path].ts` (reads `ZAI_API_KEY` env var)
+- **Prod:** Pages Function `functions/api/[[path]].ts` (reads `ZAI_API_KEY` env var)
 
 ## Scripts
 
