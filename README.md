@@ -71,7 +71,7 @@ Git integration — every push to `main` rebuilds and deploys automatically.
 
 | Field | Value |
 | --- | --- |
-| Framework preset | None |
+| Framework preset | React (Vite) |
 | Build command | `bun run build` |
 | Build output directory | `dist` |
 | Root directory | (leave empty) |
