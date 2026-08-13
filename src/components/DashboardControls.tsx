@@ -8,8 +8,8 @@ import {
   IconEyeOff,
 } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { METRICS, type Metric } from '@/lib/metrics'
+import { cn } from '@/lib/utils'
 
 const METRIC_ICON = { calls: IconApi, tokens: IconCoin } as const
 const GRAN_ICON = { hourly: IconClock, daily: IconCalendar } as const
@@ -103,15 +103,26 @@ export function DashboardControls({
         />
         <IconArrowsExchange className="size-3 text-muted-foreground" />
       </Button>
-      <Tabs value={datasetId} onValueChange={onDatasetChange}>
-        <TabsList>
-          {tabs.map((t) => (
-            <TabsTrigger key={t.id} value={t.id}>
-              {t.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+      <fieldset
+        aria-label="Dataset"
+        className="inline-flex h-8 w-fit items-center justify-center rounded-lg bg-muted p-[3px]"
+      >
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => onDatasetChange(t.id)}
+            aria-pressed={t.id === datasetId}
+            className={cn(
+              'relative inline-flex h-[calc(100%-1px)] flex-1 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent px-1.5 py-0.5 font-medium text-foreground/60 text-sm transition-all hover:text-foreground focus-visible:border-ring focus-visible:outline-1 focus-visible:outline-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:text-muted-foreground dark:hover:text-foreground',
+              t.id === datasetId &&
+                'bg-background text-foreground shadow-sm dark:border-input dark:bg-input/30 dark:text-foreground',
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </fieldset>
     </div>
   )
 }

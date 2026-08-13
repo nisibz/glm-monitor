@@ -56,7 +56,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="mx-auto flex min-h-svh max-w-6xl flex-col gap-4 p-4 transition-colors duration-300 md:p-6">
+    <main className="mx-auto flex min-h-svh max-w-6xl flex-col gap-4 p-4 transition-colors duration-300 md:p-6">
       <DashboardHeader
         lastUpdated={lastUpdated}
         loading={loading}
@@ -106,6 +106,6 @@ export default function Dashboard() {
           No data available.
         </p>
       )}
-    </div>
+    </main>
   )
 }

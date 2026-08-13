@@ -1,0 +1,12 @@
+# GLM Usage Monitor
+
+> Dashboard for monitoring Z.AI GLM model call and token usage: quota, burn rate, and hourly/daily usage views.
+
+## Pages
+
+- [Dashboard](https://glm-monitor.pages.dev/): Quota dashboard with today (hourly), 7-day (hourly), and 30-day (daily) usage views.
+- [Source code](https://github.com/anomalyco/glm-monitor): Vite + React + TypeScript source.
+
+## Notes
+
+- Can be read by AI agents, crawlers, and bots.
