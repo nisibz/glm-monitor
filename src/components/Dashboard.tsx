@@ -5,6 +5,7 @@ import { LoadError } from '@/components/LoadError'
 import { Loading } from '@/components/Loading'
 import { QuotaCard } from '@/components/QuotaCard'
 import { UsageTable } from '@/components/UsageTable'
+import { Skeleton } from '@/components/ui/skeleton'
 import { aggregateDaily } from '@/data/usage'
 import { useQuota } from '@/hooks/useQuota'
 import { useUsageData } from '@/hooks/useUsageData'
@@ -15,7 +16,7 @@ const UsageChart = lazy(() => import('@/components/UsageChart'))
 const UsagePattern = lazy(() => import('@/components/UsagePattern'))
 
 function ChartFallback() {
-  return <div className="h-135 animate-pulse rounded-lg bg-muted/50" />
+  return <Skeleton className="h-135" />
 }
 
 export default function Dashboard() {

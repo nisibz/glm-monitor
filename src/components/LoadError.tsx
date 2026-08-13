@@ -14,7 +14,7 @@ export function LoadError({
       <AlertTitle className="flex items-center justify-between">
         Failed to load data
         <Button variant="outline" size="sm" onClick={onRetry}>
-          <IconRefresh className="size-4" /> Retry
+          <IconRefresh data-icon="inline-start" /> Retry
         </Button>
       </AlertTitle>
       <AlertDescription>{error}</AlertDescription>

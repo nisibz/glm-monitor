@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { QuotaLimit } from '@/data/quota'
 import type { Row } from '@/data/usage'
 import {
@@ -226,14 +227,12 @@ export function QuotaCard({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {loading && !quota && (
-          <div className="h-32 animate-pulse rounded-lg bg-muted/50" />
-        )}
+        {loading && !quota && <Skeleton className="h-32" />}
         {error && (
           <div className="flex items-center justify-between gap-2">
             <p className="text-destructive text-sm">{error}</p>
             <Button variant="outline" size="sm" onClick={() => void retry()}>
-              <IconRefresh className="size-4" /> Retry
+              <IconRefresh data-icon="inline-start" /> Retry
             </Button>
           </div>
         )}
