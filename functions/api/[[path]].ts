@@ -17,12 +17,16 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
     const res = await proxy(context.request, context.env)
     if (res.ok) {
+      const headers = new Headers(res.headers)
+      headers.delete('Content-Encoding')
+      headers.set(
+        'Cache-Control',
+        `public, max-age=${cacheTtlOf(url.pathname)}`,
+      )
       const resWithTtl = new Response(res.body, {
         status: res.status,
         statusText: res.statusText,
-        headers: {
-          'Cache-Control': `public, max-age=${cacheTtlOf(url.pathname)}`,
-        },
+        headers,
       })
       context.waitUntil(cache.put(url, resWithTtl.clone()))
       return resWithTtl
