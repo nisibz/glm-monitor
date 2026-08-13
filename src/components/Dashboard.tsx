@@ -1,16 +1,22 @@
-import { useMemo } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 import { DashboardControls } from '@/components/DashboardControls'
 import { DashboardHeader } from '@/components/DashboardHeader'
 import { LoadError } from '@/components/LoadError'
 import { Loading } from '@/components/Loading'
 import { QuotaCard } from '@/components/QuotaCard'
-import { UsageChart } from '@/components/UsageChart'
-import { UsagePattern } from '@/components/UsagePattern'
 import { UsageTable } from '@/components/UsageTable'
 import { aggregateDaily } from '@/data/usage'
 import { useQuota } from '@/hooks/useQuota'
 import { useUsageData } from '@/hooks/useUsageData'
 import { useViewPrefs } from '@/hooks/useViewPrefs'
+
+// ponytail: recharts (~400 kB) isolated in its own chunk so it never blocks first paint.
+const UsageChart = lazy(() => import('@/components/UsageChart'))
+const UsagePattern = lazy(() => import('@/components/UsagePattern'))
+
+function ChartFallback() {
+  return <div className="h-135 animate-pulse rounded-lg bg-muted/50" />
+}
 
 export default function Dashboard() {
   const quota = useQuota()
@@ -82,12 +88,16 @@ export default function Dashboard() {
           />
 
           <div className="grid gap-4 lg:grid-cols-[7fr_3fr]">
-            <UsageChart rows={visibleRows} metric={metric} />
+            <Suspense fallback={<ChartFallback />}>
+              <UsageChart rows={visibleRows} metric={metric} />
+            </Suspense>
             <UsageTable rows={visibleRows} />
           </div>
 
           {hourlyMonth.length > 0 && (
-            <UsagePattern rows={hourlyMonth} metric={metric} />
+            <Suspense fallback={<ChartFallback />}>
+              <UsagePattern rows={hourlyMonth} metric={metric} />
+            </Suspense>
           )}
         </>
       ) : (

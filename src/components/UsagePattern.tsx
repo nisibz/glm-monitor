@@ -78,7 +78,7 @@ function ChartCard({ title, data, color, metric }: ChartCardProps) {
   )
 }
 
-export function UsagePattern({
+export default function UsagePattern({
   rows,
   metric,
 }: {

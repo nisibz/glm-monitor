@@ -12,7 +12,13 @@ import type { Row } from '@/data/usage'
 import { fmtCompact, fmtInt, timeLabel } from '@/lib/format'
 import { METRICS, type Metric } from '@/lib/metrics'
 
-export function UsageChart({ rows, metric }: { rows: Row[]; metric: Metric }) {
+export default function UsageChart({
+  rows,
+  metric,
+}: {
+  rows: Row[]
+  metric: Metric
+}) {
   const m = METRICS[metric]
 
   return (
